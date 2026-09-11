@@ -1,0 +1,23 @@
+* {
+    box-sizing: border-box !important;
+}
+
+.ant-layout-header {
+    padding: 0 !important;
+}
+
+.ant-layout-footer {
+    padding: 0 !important;
+}
+
+.ant-tabs-tab {
+    font-size: 20px !important;
+}
+
+.ant-tabs-nav {
+    margin: 0 !important;
+}
+
+.ant-tabs-tab+.ant-tabs-tab {
+    margin-left: 48px !important;
+}

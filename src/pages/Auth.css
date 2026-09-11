@@ -1,0 +1,26 @@
+.title {
+    margin-bottom: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.text {
+    margin-bottom: 20px;
+    width: 460px;
+    font-size: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.robot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
