@@ -1,10 +1,14 @@
-import { getKnowledgeCategory, getKnowledgeList } from '@/api/knowledge'
+import { getKnowledgeCategory, getKnowledgeList, createKnowledge, updateKnowledgeStatus, deleteKnowledge, updateKnowledge } from '@/api/knowledge'
+import { getArticle } from "@/api/article"
 import { uploadFile } from '@/api/upload'
 import { App, Button, Form, Input, Select, Table, Modal, Upload } from 'antd'
 import type { UploadProps } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './Knowledge.css'
 import { DeleteOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
+import '@wangeditor/editor/dist/css/style.css'
+import { Editor, Toolbar } from '@wangeditor/editor-for-react'
+import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
 
 export default function Knowledge() {
   const { message: messageApi } = App.useApp()
@@ -22,6 +26,13 @@ export default function Knowledge() {
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>();
   const [businessId, setBusinessId] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalCategoryId, setModalCategoryId] = useState(null);
+  const [modalSummary, setModalSummary] = useState('');
+  const [modalTags, setModalTags] = useState([]);
+  const [isEdit, setIsEdit] = useState(false)
+  const currentId = useRef(null)
   const params = {
     title,
     categoryId,
@@ -99,9 +110,9 @@ export default function Knowledge() {
       key: 'operate',
       render: (_, item) => {
         return (<div>
-          <Button type='text' style={{ color: '#1677ff', marginRight: '10px' }}>编辑</Button>
-          <Button type='text' style={{ color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} >{item.status === 2 ? '发布' : '下线'}</Button>
-          <Button type='text' style={{ color: '#ff4d4f' }}>删除</Button>
+          <Button type='text' style={{ color: '#1677ff', marginRight: '10px' }} onClick={() => handleEdit(item)}>编辑</Button>
+          <Button type='text' style={{ color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} onClick={() => handleUpdate(item)}>{item.status === 2 ? '发布' : '下线'}</Button>
+          <Button type='text' style={{ color: '#ff4d4f' }} onClick={() => handleDelete(item)}>删除</Button>
         </div>)
       }
     },
@@ -131,7 +142,7 @@ export default function Knowledge() {
     setLoading(true);
     try {
       const res: any = await uploadFile(file, { businessId });
-      const url = typeof res === 'string' ? res : res?.filePath ?? res?.url ?? res?.fileUrl ?? res?.path;
+      const url = res.filePath;
       if (!url) {
         messageApi.error('图片上传失败');
         onError?.(new Error('no url returned'));
@@ -146,17 +157,132 @@ export default function Knowledge() {
       setLoading(false);
     }
   };
+
+  // editor 实例
+  const [editor, setEditor] = useState<IDomEditor | null>(null)
+
+  // 编辑器内容
+  const [html, setHtml] = useState('')
+
+  // 工具栏配置
+  const toolbarConfig: Partial<IToolbarConfig> = {}
+
+  // 编辑器配置
+  const editorConfig: Partial<IEditorConfig> = {
+    placeholder: '请输入内容...',
+  }
+
+  // 及时销毁 editor
+  useEffect(() => {
+    return () => {
+      if (editor == null) return
+      editor.destroy()
+      setEditor(null)
+    }
+  }, [editor])
+  const handleSubmit = () => {
+    if (!isEdit) {
+      createKnowledge({
+        title: modalTitle,
+        summary: modalSummary,
+        categoryId: modalCategoryId,
+        tags: modalTags.join(','),
+        coverImage: imageUrl,
+        content: html,
+        id: ''
+      }).then(res => {
+        messageApi.open({
+          type: 'success',
+          content: '新增成功'
+        })
+        setIsModalOpen(false)
+        setImageUrl('')
+        setHtml('')
+        setModalTitle('')
+        setModalCategoryId(null)
+        setModalSummary('')
+        setModalTags([])
+        getKnowledgeList({}).then(res => {
+          setRecords(res.records)
+          setTotal(res.total)
+        })
+      })
+    } else {
+      updateKnowledge(currentId.current, {
+        title: modalTitle,
+        summary: modalSummary,
+        categoryId: modalCategoryId,
+        tags: modalTags.join(','),
+        coverImage: imageUrl,
+        content: html,
+        id: currentId
+      }).then(res => {
+        messageApi.open({
+          type: 'success',
+          content: '编辑成功'
+        })
+        setIsModalOpen(false)
+        setImageUrl('')
+        setHtml('')
+        setModalTitle('')
+        setModalCategoryId(null)
+        setModalSummary('')
+        setModalTags([])
+        getKnowledgeList({}).then(res => {
+          setRecords(res.records)
+          setTotal(res.total)
+        })
+      })
+    }
+  }
+  const handleUpdate = (row) => {
+    updateKnowledgeStatus(row.key, { status: row.status == '2' ? '1' : '2' }).then(res => {
+      messageApi.open({
+        type: 'success',
+        content: '操作成功'
+      })
+      getKnowledgeList(params).then(res => {
+        setRecords(res.records)
+        setTotal(res.total)
+      })
+    })
+  }
+  const handleDelete = (row) => {
+    deleteKnowledge(row.key).then(res => {
+      messageApi.open({
+        type: 'success',
+        content: '删除成功'
+      })
+      getKnowledgeList(params).then(res => {
+        setRecords(res.records)
+        setTotal(res.total)
+      })
+    })
+  }
+  const handleEdit = (row) => {
+    currentId.current = row.key
+    setIsEdit(true)
+    setIsModalOpen(true)
+    getArticle(row.key).then(res => {
+      setImageUrl(res.coverImage)
+      setHtml(res.content)
+      setModalTitle(res.title)
+      setModalCategoryId(res.categoryId)
+      setModalSummary(res.summary)
+      setModalTags(res.tagArray)
+    })
+  }
   return (
     <div>
       <div className='flex justify-between items-center p-3'>
         <span className='text-2xl font-bold'>知识文章</span>
         <span>
-          <Button type='primary' style={{ marginRight: '8px' }} onClick={() => { setBusinessId(crypto.randomUUID()); setImageUrl(undefined); setIsModalOpen(true) }}>新增</Button>
-          <Button type='primary'>编辑</Button>
+          <Button type='primary' style={{ marginRight: '8px' }} onClick={() => { setBusinessId(crypto.randomUUID()); setImageUrl(undefined); setIsModalOpen(true); setShowPreview(false); setIsEdit(false) }}>新增</Button>
+
         </span>
       </div>
       <div className='m-3'>
-        <Form form={form} style={{ display: 'flex', padding: '10px' }} onFinish={handleSearch}>
+        <Form style={{ display: 'flex', padding: '10px' }} onFinish={handleSearch}>
           <Form.Item name='title' label='文章标题'>
             <Input style={{ width: '250px', marginRight: '20px' }} onChange={(e) => setTitle(e.currentTarget.value)}></Input>
           </Form.Item>
@@ -183,7 +309,6 @@ export default function Knowledge() {
           <Form.Item>
             <Button type='primary' htmlType='submit' style={{ marginRight: '8px' }}>查询</Button>
             <Button onClick={() => {
-              form.resetFields()
               setTitle('')
               setCategoryId(null)
               setAuthorName('')
@@ -211,35 +336,48 @@ export default function Knowledge() {
 
         </Table>
       </div>
-      <Modal open={isModalOpen} title='新增知识文章' width={800} okText='新增' onCancel={() => setIsModalOpen(false)}>
-        <div className='h-[70vh] p-5'>
-          <Form labelCol={{ span: 3 }} labelAlign='right'>
-            <Form.Item name='title' label='文章标题' rules={[{ required: true }]}>
-              <Input style={{ width: '600px' }} maxLength={200}
+      <Modal closable={false} open={isModalOpen} styles={{ title: { fontSize: '20px' } }} title={isEdit ? '编辑文章' : '新增知识文章'} width={800} 
+        okText={isEdit ? '编辑':'新增'}
+        onCancel={() => setIsModalOpen(false)}
+        onOk={handleSubmit}
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            <Button onClick={() => setShowPreview((pre) => !pre)}>{showPreview ? '隐藏预览' : '查看预览'}</Button>
+            <CancelBtn />
+            <OkBtn />
+          </>)}>
+        <div className='h-[70vh] p-5 overflow-auto'>
+          <Form form={form} labelCol={{ span: 3 }} labelAlign='right'>
+            <Form.Item label='文章标题' rules={[{ required: true }]}>
+              <Input style={{ width: '600px' }} maxLength={200} value={modalTitle} onChange={(e) => setModalTitle(e.currentTarget.value)}
                 showCount={{ formatter: ({ count, maxLength }) => `${count}/${maxLength}` }}></Input>
             </Form.Item>
-            <Form.Item name='categoryId' label='分类' rules={[{ required: true }]}>
+            <Form.Item label='分类' rules={[{ required: true }]}>
               <Select
                 style={{ width: '600px' }}
+                value={modalCategoryId}
+                onChange={(v) => setModalCategoryId(v)}
                 options={options}
               />
             </Form.Item>
-            <Form.Item name='summary' label='文章摘要'>
+            <Form.Item label='文章摘要' rules={[{ required: true }]}>
               <Input.TextArea style={{ width: '600px' }} maxLength={1000} placeholder='(可选)' autoSize={{ minRows: 4, maxRows: 4 }}
-                showCount={{ formatter: ({ count, maxLength }) => `${count}/${maxLength}` }}></Input.TextArea>
+                showCount={{ formatter: ({ count, maxLength }) => `${count}/${maxLength}` }}
+                value={modalSummary} onChange={(e) => setModalSummary(e.currentTarget.value)}></Input.TextArea>
             </Form.Item>
-            <Form.Item name='tags' label='标签' >
+            <Form.Item label='标签' rules={[{ required: true }]}>
               <Select
                 style={{ width: '600px' }}
                 mode='tags'
                 allowClear
                 placeholder='请选择或输入标签(可选)'
                 options={commonTags.map(item => ({ value: item, label: item }))}
+                value={modalTags}
+                onChange={(tags) => setModalTags(tags)}
               />
             </Form.Item>
-            <Form.Item label='封面' >
+            <Form.Item label='封面'>
               <Upload
-                name="file"
                 listType="picture-card"
                 showUploadList={false}
                 maxCount={1}
@@ -264,9 +402,35 @@ export default function Knowledge() {
               </Upload>
 
             </Form.Item>
+            <Form.Item label='文章内容' rules={[{ required: true }]}>
+              <div className='pr-4'>
+                <div style={{ border: '1px solid #ccc', zIndex: 100 }}>
+                  <Toolbar
+                    editor={editor}
+                    defaultConfig={toolbarConfig}
+                    mode="default"
+                    style={{ borderBottom: '1px solid #ccc' }}
+                  />
+                  <Editor
+                    defaultConfig={editorConfig}
+                    value={html}
+                    onCreated={setEditor}
+                    onChange={(editor) => setHtml(editor.getHtml())}
+                    mode="default"
+                    style={{ height: '300px', overflowY: 'hidden' }}
+                  />
+                </div>
+                {showPreview && <div className='mt-3'>
+                  <div className='text-[16px] font-bold opacity-60'>预览效果如下</div>
+                  <div dangerouslySetInnerHTML={{ __html: html }} className='mt-2 p-3' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}></div>
+                </div>
+
+                }
+              </div>
+            </Form.Item>
           </Form>
         </div>
       </Modal>
-    </div>
+    </div >
   )
 }

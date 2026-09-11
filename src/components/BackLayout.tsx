@@ -21,6 +21,7 @@ export default function BackLayout() {
     const [collapsed, setCollapsed] = useState(false);
     const [showTitle, setShowTitle] = useState(true);
     const [dropdown, setDropdown] = useState(false);
+    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
@@ -108,11 +109,11 @@ export default function BackLayout() {
                     <div className=' flex justify-between items-center w-full p-5'>
                         <span className=' text-2xl font-bold'>{PathToLabel[current_path as keyof typeof PathToLabel]}</span>
                         <div className=' flex items-center px-5'>
-                            <Avatar src={'http://159.75.169.224:1235'+ JSON.parse(localStorage.getItem('userInfo')).avatar}></Avatar>
+                            <Avatar src={userInfo.avatar} style={{ backgroundColor: '#0078D4' }}>{userInfo.username?.[0]}</Avatar>
                             <span className='w-[8px]'></span>
-                            <Dropdown menu={{ items: [{ label: (<div className='px-2' onClick={handleLogout}>退出登录</div>), key: '0' }] }} trigger={['click']} placement='bottom'>
+                            <Dropdown menu={{ items: [{ label: (<div className='px-2 text-[16px]' onClick={handleLogout}>退出登录</div>), key: '0' }] }} trigger={['click']} placement='bottom'>
                                 <div className=' cursor-pointer' onClick={() => setDropdown(!dropdown)}>
-                                    <span className=' mr-2 text-xl'>{JSON.parse(localStorage.getItem('userInfo')).username}</span>
+                                    <span className=' mr-2 text-xl'>{userInfo.username}</span>
                                     {dropdown ? <UpOutlined /> : <DownOutlined />}
                                 </div>
                             </Dropdown>
