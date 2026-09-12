@@ -41,7 +41,7 @@ export default function Article() {
                     <div className="mb-3 text-[16px]">相关标签</div>
                     <div className="mb-3">
                         {article.tagArray && article.tagArray.map(item=>{
-                            return (<Tag style={{marginRight:'10px'}}><span className="text-[15px] opacity-70">{item}</span></Tag>)
+                            return (<Tag key={item} style={{marginRight:'10px'}}><span className="text-[15px] opacity-70">{item}</span></Tag>)
                         })}
                     </div>
                 </Card>
