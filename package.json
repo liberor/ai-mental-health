@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-react": "^1.0.6",
     "antd": "^6.6.3",
     "axios": "^1.20.0",
+    "dayjs": "^1.11.23",
     "echarts": "^6.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

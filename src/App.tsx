@@ -63,7 +63,7 @@ function App() {
                 ]}
               />
               {!HasClientAuth ? <Button type='primary' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px' }} onClick={() => Nav('/auth/register')}>注册</Button>
-                : <Button type='text' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px', border: "solid #666 2px", opacity: "70%" }} onClick={() => handleLogout()}>退出登录</Button>}
+                : <Button type='text' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px',padding:'5px 8px', border: "solid #ccc 2px", opacity: "70%" }} onClick={() => handleLogout()}>退出登录</Button>}
             </div>
           </div>
         </Header>

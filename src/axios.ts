@@ -15,8 +15,7 @@ service.interceptors.request.use(
         return config
     },
     (err) => {
-        Promise.reject(err)
-        return
+        return Promise.reject(err)
     }
 )
 
@@ -26,21 +25,26 @@ service.interceptors.response.use(
         if (data.code === '200') {
             return data.data
         } else if (data.code === '-1') {
-            if (!config.url?.includes('/login')) {
+            if (data.msg !== "无效的会话ID格式" && !config.url?.includes('/login')) {
                 message.error(data.msg || '登录过期,请重新登录')
                 localStorage.removeItem('mental-token')
                 localStorage.removeItem('userInfo')
                 router.navigate('/auth/login', { replace: true })
             }
+            return res
         } else {
             message.error(data.msg)
-            Promise.reject('网络请求失败')
-            return
+            return Promise.reject('网络请求失败')
         }
     },
     (err) => {
-        Promise.reject(err)
-        return
+        // if(err.status === 403){
+        //     message.error('登录过期,请重新登录')
+        //     localStorage.removeItem('mental-token')
+        //     localStorage.removeItem('userInfo')
+        //     window.location.replace('/auth/login')
+        // }
+        return Promise.reject(err)
     }
 )
 export default service

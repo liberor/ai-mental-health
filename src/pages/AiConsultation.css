@@ -1,6 +1,6 @@
 .ai-consultation .breathing-circle {
-    width: 80px;
-    height: 80px;
+    width: 66px;
+    height: 66px;
     background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
     border-radius: 50%;
     display: flex;
@@ -12,6 +12,32 @@
     position: relative;
 }
 
+.ai-consultation .breathing-circle-chat-avatar {
+    width: 49px;
+    height: 49px;
+    background: linear-gradient(135deg, #fb923c 0%, #f59e0b 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: breathing 4s ease-in-out infinite;
+    box-shadow: 0 6px 24px rgba(251, 146, 60, 0.25);
+    position: relative;
+}
+
+.ai-consultation .breathing-circle-chat-avatar-user {
+    width: 49px;
+    height: 49px;
+    background: linear-gradient(135deg, #5A606A 0%, #828892 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: breathing 4s ease-in-out infinite;
+    box-shadow: 0 6px 24px rgba(99, 87, 77, 0.25);
+    position: relative;
+}
+
 .ai-consultation .assistant-name {
     font-size: 18px;
     font-weight: 700;
@@ -20,7 +46,7 @@
     -webkit-text-fill-color: transparent;
     text-align: center;
     background-clip: text;
-    margin: 0 0 12px;
+    margin: 0 0 6px;
 }
 
 .ai-consultation .online-status {
@@ -56,12 +82,20 @@
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
     color: #fff;
 }
+
 .ai-consultation .emotion-info-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+}
+.ai-consultation .emotion-info-dot-bad {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #333 0%, #555 50%, #ddd 100%);
 }
 
 .ai-consultation .chat-main .ant-card-body {
@@ -77,5 +111,167 @@
 }
 
 .ai-consultation .chat-main .ant-card {
-    border-radius: 20px ;
+    border-radius: 20px;
+}
+
+.ai-consultation .history-list-item {
+    border-radius: 12px;
+    border: solid rgba(0, 0, 0, 0) 2px;
+}
+
+.ai-consultation .history-list-item:hover {
+    background-color: #F7F9FF;
+    border: solid #EAF0F8 2px;
+}
+
+.ai-consultation .history-list .ant-card-body {
+    height: 100%;
+}
+
+.ai-consultation .delete-icon {
+    color: #796160;
+    font-size: 20px;
+    transition: all 0.2s;
+}
+
+.ai-consultation .delete-icon:hover {
+    color: #ce2e25;
+}
+
+.ai-consultation .markdown-content {
+    line-height: 1.6;
+    color: inherit;
+}
+
+.ai-consultation .markdown-content h1,
+.ai-consultation .markdown-content h2,
+.ai-consultation .markdown-content h3 {
+    margin: 1em 0 0.5em 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.ai-consultation .markdown-content h1 {
+    font-size: 1.5em;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.3em;
+}
+
+.ai-consultation .markdown-content h2 {
+    font-size: 1.3em;
+    color: #374151;
+}
+
+.ai-consultation .markdown-content h3 {
+    font-size: 1.1em;
+    color: #4b5563;
+}
+
+.ai-consultation .markdown-content p {
+    margin: 0.5em 0;
+}
+
+.ai-consultation .markdown-content ul,
+.ai-consultation .markdown-content ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+}
+
+.ai-consultation .markdown-content li {
+    margin: 0.3em 0;
+}
+
+.ai-consultation .markdown-content blockquote {
+    border-left: 4px solid #d1d5db;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: #6b7280;
+    font-style: italic;
+    background: #f9fafb;
+    border-radius: 0 0.5em 0.5em 0;
+    padding: 0.5em 1em;
+}
+
+.ai-consultation .ai-markdown blockquote {
+    border-left-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.ai-consultation .markdown-content hr {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 1.5em 0;
+}
+
+.ai-consultation .markdown-content code.inline-code {
+    background: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25em;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85em;
+    color: #e11d48;
+}
+
+.ai-consultation .ai-markdown code.inline-code {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.ai-consultation .markdown-content pre.code-block {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1em;
+    border-radius: 0.5em;
+    overflow-x: auto;
+    margin: 1em 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.ai-consultation .markdown-content pre.code-block code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+.ai-consultation .markdown-content a {
+    color: #3b82f6;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.ai-consultation .markdown-content a:hover {
+    border-bottom-color: #3b82f6;
+}
+
+.ai-consultation .ai-markdown a {
+    color: #1e40af;
+}
+
+.ai-consultation .ai-markdown a:hover {
+    border-bottom-color: #1e40af;
+}
+
+.ai-consultation .markdown-content strong {
+    font-weight: 600;
+    color: #374151;
+}
+
+.ai-consultation .ai-markdown strong {
+    color: #1e40af;
+}
+
+.ai-consultation .markdown-content em {
+    font-style: italic;
+    color: #6b7280;
+}
+
+.ai-consultation .risk-notice {
+    background: linear-gradient(135deg, #fff9e6, #ffeaa7);
+    border-radius: 16px;
+    padding: 12px;
+    border: 1px solid rgba(255, 234, 167, 0.6);
+    box-shadow: 0 6px 20px rgba(255, 234, 167, 0.3);
 }

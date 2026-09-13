@@ -99,12 +99,12 @@ export default function MoodDiary() {
                     <div className='text-2xl font-bold mb-5'>详细记录</div>
                     <div className='text-[16px] opacity-80 m-2'>情绪触发因素</div>
                     <div className='text-[16px]'>
-                        <Input.TextArea placeholder='今天什么事情影响了您的情绪？' maxLength={1000} autoSize={{ minRows: 4, maxRows: 4 }} showCount
+                        <Input.TextArea style={{fontSize:'16px'}} placeholder='今天什么事情影响了您的情绪？' maxLength={1000} autoSize={{ minRows: 4, maxRows: 4 }} showCount
                             value={emotionTriggers} onChange={(e) => setEmotionTriggers(e.currentTarget.value)}></Input.TextArea>
                     </div>
                     <div className='text-[16px] opacity-80 m-2'>今日感想</div>
                     <div className='text-[16px]'>
-                        <Input.TextArea placeholder='写下您今天的想法、感受或发生的有趣事情…' maxLength={2000} autoSize={{ minRows: 6, maxRows: 6 }} showCount
+                        <Input.TextArea style={{fontSize:'16px'}} placeholder='写下您今天的想法、感受或发生的有趣事情…' maxLength={2000} autoSize={{ minRows: 6, maxRows: 6 }} showCount
                             value={diaryContent} onChange={(e) => setDiaryContent(e.currentTarget.value)}></Input.TextArea>
                     </div>
                     <Row gutter={20}>
