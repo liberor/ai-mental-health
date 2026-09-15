@@ -11,6 +11,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-react'
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
 
 export default function Knowledge() {
+  const h = document.documentElement.clientWidth
   const { message: messageApi } = App.useApp()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [form] = Form.useForm()
@@ -88,25 +89,25 @@ export default function Knowledge() {
       title: '分类',
       dataIndex: 'categoryName',
       key: 'categoryName',
-      width: 360
+      width: h == 1920 ? 200 : 300
     },
     {
       title: '作者',
       dataIndex: 'authorName',
       key: 'authorName',
-      width: 360
+      width: h == 1920 ? 240 : 360
     },
     {
       title: '阅读量',
       dataIndex: 'readCount',
       key: 'readCount',
-      width: 300
+      width: h == 1920 ? 200 : 300
     },
     {
       title: '发布时间',
       dataIndex: 'publishedAt',
       key: 'publishedAt',
-      width: 360
+      width: h == 1920 ? 240 : 360
     },
     {
       title: '操作',

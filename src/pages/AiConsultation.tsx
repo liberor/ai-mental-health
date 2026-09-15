@@ -32,6 +32,7 @@ const getEmotionScoreColor = (isNegative, score) => {
 }
 
 export default function AiConsultation() {
+  const h = document.documentElement.clientWidth
   const [historyList, setHistoryList] = useState([])
   const [hasHistoryList, setHasHistoryList] = useState(false)
   const [userMsg, setUserMsg] = useState('')
@@ -209,8 +210,8 @@ export default function AiConsultation() {
           {!isShowHistoryOnly && <div className='w-full h-[14vh]  mb-6' >
             <Card hoverable style={{ cursor: 'default', height: '100%' }}>
               <div className=' h-full flex flex-col items-center'>
-                <div className='breathing-circle'><Avatar src={robot} size={42}></Avatar></div>
-                <div className='assistant-name'>宁渡AI助手</div>
+                <div className='breathing-circle' style={{marginBottom:h==1920?'3px':'12px'}}><Avatar src={robot} size={42}></Avatar></div>
+                <div className='assistant-name' style={{marginBottom:h==1920?'2px':'6px'}}>宁渡AI助手</div>
                 <div className='online-status'><span className='status-dot'></span>在线服务中</div>
               </div>
             </Card>
@@ -219,12 +220,12 @@ export default function AiConsultation() {
             <Card hoverable style={{ cursor: 'default', background: ' linear-gradient(135deg, #fef9e7 0%, #fcf4e6 50%, #f6f0e8 100%)' }}>
               <div>
                 <div className='text-xl font-bold' style={{ color: '#8b4513' }}>情绪花园</div>
-                <div className='h-[15vh] pt-3  flex flex-col items-center'>
-                  <div className='emotion-info mb-3'>
+                <div className='h-[15vh] flex flex-col items-center' style={{paddingTop:h == 1920 ? '0px' : '12px'}}>
+                  <div className='emotion-info ' style={{marginBottom:h == 1920 ? '0px' : '12px'}}>
                     <div className='text-[18px] font-bold'>{currentEmotion == null ? "中性" : (currentEmotion.isNegative ? '消极' : '积极')}</div>
                     <div className='text-[18px] font-bold' style={{ color: currentEmotion ? getEmotionScoreColor(currentEmotion.isNegative,currentEmotion.emotionScore) : 'white' }}>{currentEmotion == null ? "50" : currentEmotion.emotionScore}</div>
                   </div>
-                  <div className='flex justify-center items-center mb-3'>
+                  <div className='flex justify-center items-center' style={{marginBottom:h == 1920 ? '5px' : '12px',marginTop:h == 1920 ? '5px' : '0px'}}>
                     <span className='text-[16px] mr-3 opacity-80'>今天感觉</span>
                     <span className='text-xl font-bold'>{currentEmotion == null ? "很不错" : currentEmotion.primaryEmotion}</span>
                   </div>
@@ -241,7 +242,7 @@ export default function AiConsultation() {
                   </div>
                 </div>
                 {currentEmotion && currentEmotion.improvementSuggestions && currentEmotion.improvementSuggestions.length > 0 && <div>
-                  <div className='text-[18px] font-bold mt-5 mb-4' style={{ color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
+                  <div className='text-[18px] font-bold ' style={{marginBottom:h == 1920 ? '8px' : '16px',marginTop:h == 1920 ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
                   {currentEmotion.improvementSuggestions.map(item => {
                     return <div key={item} className='py-1 pl-5 mb-3' style={{ borderRadius: '12px', backgroundColor: '#FDFDF8', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}><span className='text-xl mr-2'>✨</span><span className='text-[15px] ' style={{ color: '#9D9487', fontWeight: '500' }}>{item}</span></div>
                   })}

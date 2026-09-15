@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
 
 export default function Emotional() {
+  const h = document.documentElement.clientWidth
   const { message: messageApi } = App.useApp()
   const [emotionals, setEmotionals] = useState([])
   const [hasEmotionals, setHasEmotionals] = useState(false)
@@ -22,7 +23,6 @@ export default function Emotional() {
       setHasEmotionals(true)
     })
   }, [])
-  const [form] = Form.useForm()
   const onFinish = () => {
     setHasEmotionals(false)
     getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then(res => {
@@ -64,26 +64,26 @@ export default function Emotional() {
       title: <div className='px-6'>用户id</div>,
       dataIndex: 'userId',
       key: 'userId',
-      width: 150,
+      width: h == 1920 ? 140 : 150,
       align: 'center'
     },
     {
       title: <div>会话id</div>,
       dataIndex: 'id',
       key: 'id',
-      width: 150,
+      width: h == 1920 ? 110 : 150,
       align: 'center'
     },
     {
       title: <div>记录日期</div>,
       dataIndex: 'diaryDate',
       key: 'diaryDate',
-      width: 270,
+      width: h == 1920 ? 130 : 270,
     },
     {
       title: <div>情绪评分</div>,
       key: 'moodScore',
-      width: 450,
+      width: h == 1920 ? 320 : 450,
       render: (row) => {
         return <div>
           <Rate disabled allowHalf defaultValue={row.moodScore} count={10}></Rate>
@@ -93,7 +93,7 @@ export default function Emotional() {
     {
       title: <div>生活指标</div>,
       key: 'lifeIndex',
-      width: 160,
+      width: h == 1920 ? 120 : 160,
       render: (row) => {
         return <div>
           <div>睡眠:{row.sleepQuality ? row.sleepQuality + '/5' : <span className=' opacity-60'>未填写</span>}</div>
@@ -104,7 +104,7 @@ export default function Emotional() {
     {
       title: <div>情绪触发因素</div>,
       key: 'emotionTriggers',
-      width: 400,
+      width: h == 1920 ? 300 : 400,
       render: (row) => {
         return <div className=' text-[16px]'>
           {row.emotionTriggers ? row.emotionTriggers : <span className=' opacity-60'>用户没有填写...</span>}
@@ -114,7 +114,7 @@ export default function Emotional() {
     {
       title: <div>日记内容</div>,
       key: 'diaryContent',
-      width: 400,
+      width: h == 1920 ? 300 : 400,
       render: (row) => {
         return <div className=' text-[16px]'>
           {row.diaryContent ? row.diaryContent : <span className=' opacity-60'>用户没有填写...</span>}
@@ -156,9 +156,9 @@ export default function Emotional() {
         <span className='text-2xl font-bold'>情绪日志</span>
       </div>
       <div className='m-3 p-3'>
-        <Form className='flex' form={form} onFinish={onFinish}>
-          <Form.Item name='userId' label='用户ID' >
-            <Input placeholder='请输入用户ID' style={{ width: '250px', marginRight: '20px' }} onChange={(e) => setUserId(e.currentTarget.value)}></Input>
+        <Form className='flex' onFinish={onFinish}>
+          <Form.Item label='用户ID' >
+            <Input placeholder='请输入用户ID' style={{ width: '250px', marginRight: '20px' }} value={userId} onChange={(e) => setUserId(e.currentTarget.value)}></Input>
           </Form.Item>
           <Form.Item label='情绪评分范围'>
             <Slider range min={0} max={10} value={[minMoodScore, maxMoodScore]} style={{ width: '250px', marginRight: '36px' }}
@@ -171,7 +171,6 @@ export default function Emotional() {
           <Form.Item>
             <Button type='primary' htmlType='submit' style={{ marginRight: '8px' }}>查询</Button>
             <Button onClick={() => {
-              form.resetFields()
               setUserId('')
               setMinMoodScore(0)
               setMaxMoodScore(10)

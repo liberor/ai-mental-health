@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 12px;
+    margin: 0 auto ;
     animation: breathing 4s ease-in-out infinite;
     box-shadow: 0 6px 24px rgba(251, 146, 60, 0.25);
     position: relative;
@@ -46,7 +46,6 @@
     -webkit-text-fill-color: transparent;
     text-align: center;
     background-clip: text;
-    margin: 0 0 6px;
 }
 
 .ai-consultation .online-status {

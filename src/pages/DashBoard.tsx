@@ -11,7 +11,9 @@ import gsap from 'gsap'
 import { useNavigate } from 'react-router-dom'
 gsap.ticker.fps(52)
 
+
 export default function DashBoard() {
+  const h = document.documentElement.clientWidth
   const Nav = useNavigate()
   const [data, setData] = useState(null)
   const [hasdata, setHasdata] = useState(false)
@@ -459,7 +461,7 @@ export default function DashBoard() {
         <Col span={12}>
           <Card title='情绪趋势分析' styles={{ title: { fontSize: '20px' } }} hoverable style={{ cursor: 'default', height: '560px' }}>
             <div className='flex w-full h-[450px] justify-center items-end '>
-              <div id="emotion" className='h-[400px] w-[900px] '>
+              <div id="emotion" style={{height:h == 1920 ? '300px':'400px',width:h == 1920 ? '675px':'900px'}}>
                 {!hasdata && <div className='h-full flex justify-center items-center pb-[30px]'>
                   <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
                 </div>}
@@ -487,7 +489,7 @@ export default function DashBoard() {
                     </div>
                   </div>}
               </div>
-              <div id="session" className='h-[360px] w-[900px] '>
+              <div id="session" style={{height:h == 1920 ? '270px':'360px',width:h == 1920 ? '675px':'900px'}}>
                 {!hasdata && <div className='h-full flex justify-center items-center pb-[80px]'>
                   <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
                 </div>}
@@ -499,7 +501,7 @@ export default function DashBoard() {
       <div>
         <Card title='用户活跃度趋势' styles={{ title: { fontSize: '20px' } }} hoverable style={{ cursor: 'default', height: '800px' }}>
           <div className='flex w-full h-[660px] justify-center items-end'>
-            <div id="activity" className='h-[600px] w-[2000px]'>
+            <div id="activity" style={{height:h == 1920 ? '450':'600px',width:h == 1920 ? '1500px':'2000px'}} className='h-[600px] w-[2000px]'>
               {!hasdata && <div className='h-full flex justify-center items-center'>
                 <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
               </div>}
