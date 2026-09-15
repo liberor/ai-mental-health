@@ -1,10 +1,12 @@
-import { App, Button, Col, Divider, Form, Input, Modal, Popconfirm, Rate, Row, Slider, Table, Tag } from 'antd'
+import { App, Button, Col, Divider, Form, Input, Modal, Popconfirm, Rate, Row, Slider, Spin, Table, Tag } from 'antd'
 import { getEmotionals, deleteEmotionalById } from '@/api/emotional'
 import { useEffect, useState } from 'react'
+import { LoadingOutlined } from '@ant-design/icons'
 
 export default function Emotional() {
   const { message: messageApi } = App.useApp()
   const [emotionals, setEmotionals] = useState([])
+  const [hasEmotionals, setHasEmotionals] = useState(false)
   const [current, setCurrent] = useState(1)
   const [size, setSize] = useState(10)
   const [total, setTotal] = useState(0)
@@ -17,13 +19,16 @@ export default function Emotional() {
     getEmotionals({ current, size }).then(res => {
       setEmotionals(res.records ? res.records : [])
       setTotal(res.total)
+      setHasEmotionals(true)
     })
   }, [])
   const [form] = Form.useForm()
   const onFinish = () => {
+    setHasEmotionals(false)
     getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then(res => {
       setEmotionals(res.records ? res.records : [])
       setTotal(res.total)
+      setHasEmotionals(true)
     })
   }
   const riskTextMap = {
@@ -127,9 +132,11 @@ export default function Emotional() {
           }}>详情</Button>
           <Popconfirm title='删除记录' description='确认删除该记录?' onConfirm={() => {
             deleteEmotionalById(row.id).then(res => {
+              setHasEmotionals(false)
               getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then(res => {
                 setEmotionals(res.records ? res.records : [])
                 setTotal(res.total)
+                setHasEmotionals(true)
               })
               messageApi.open({
                 type: 'success',
@@ -137,7 +144,7 @@ export default function Emotional() {
               })
             })
           }}>
-            <Button type='text' style={{ color: '#ff4d4f' }}>删除</Button>
+            <Button type='text' style={{ color: '#ff4d4f',fontSize:'17px' }}>删除</Button>
           </Popconfirm>
         </div>
       }
@@ -173,7 +180,8 @@ export default function Emotional() {
         </Form>
       </div>
       <div>
-        <Table dataSource={dataSource} columns={columns} pagination={{
+        {!hasEmotionals && <div className='h-[55vh] flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{fontSize:'66px'}} spin/>}></Spin></div> }
+        {hasEmotionals && <Table dataSource={dataSource} columns={columns} pagination={{
           current,
           pageSize: size,
           total,
@@ -182,12 +190,14 @@ export default function Emotional() {
           onChange: (p, ps) => {
             setCurrent(p)
             setSize(ps)
+            setHasEmotionals(false)
             getEmotionals({ current: p, size: ps, userId, minMoodScore, maxMoodScore }).then(res => {
               setEmotionals(res.records ? res.records : [])
               setTotal(res.total)
+              setHasEmotionals(true)
             })
           },
-        }}></Table>
+        }}></Table>}
       </div>
       {currentEmotional &&
         <Modal title='情绪日志详情' styles={{ title: { fontSize: '24px', opacity: "60%" } }} centered width={1000} open={isModalOpen} onCancel={() => setIsModalOpen(false)}

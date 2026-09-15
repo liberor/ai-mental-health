@@ -1,20 +1,68 @@
-import { Row, Col, Card, Avatar } from 'antd'
+import { Row, Col, Card, Avatar, Spin, Skeleton } from 'antd'
 import { getAllData } from '@/api/dashboard'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import users from '@/assets/images/users.png'
 import like from '@/assets/images/like.png'
 import comments from '@/assets/images/comments.png'
 import smile from '@/assets/images/smile.png'
 import * as echarts from 'echarts'
-
+import { LoadingOutlined } from '@ant-design/icons'
+import gsap from 'gsap'
+import { useNavigate } from 'react-router-dom'
+gsap.ticker.fps(52)
 
 export default function DashBoard() {
+  const Nav = useNavigate()
   const [data, setData] = useState(null)
   const [hasdata, setHasdata] = useState(false)
+  const [totalUsers, setTotalUsers] = useState(0)
+  const [activeUsers, setActiveUsers] = useState(0)
+  const [totalDiaries, setTotalDiaries] = useState(0)
+  const [todayNewDiaries, setTodayNewDiaries] = useState(0)
+  const [totalSessions, setTotalSessions] = useState(0)
+  const [todayNewSessions, setTodayNewSessions] = useState(0)
+  const [avgMoodScore, setAvgMoodScore] = useState(0)
+  const nums = useRef({
+    totalUsers: 0,
+    activeUsers: 0,
+    totalDiaries: 0,
+    todayNewDiaries: 0,
+    totalSessions: 0,
+    todayNewSessions: 0,
+    avgMoodScore: 0,
+  })
   useEffect(() => {
     getAllData().then(res => {
       setHasdata(true)
       setData(res)
+      gsap.to(nums.current, {
+        totalUsers: res.systemOverview.totalUsers,
+        activeUsers: res.systemOverview.activeUsers,
+        totalDiaries: res.systemOverview.totalDiaries,
+        todayNewDiaries:res.systemOverview.todayNewDiaries,
+        totalSessions: res.systemOverview.totalSessions,
+        todayNewSessions:res.systemOverview.todayNewSessions,
+        avgMoodScore: res.systemOverview.avgMoodScore,
+        duration:0.5,
+        onUpdate:()=>{
+          setTotalUsers(nums.current.totalUsers)
+          setActiveUsers(nums.current.activeUsers)
+          setTotalDiaries(nums.current.totalDiaries)
+          setTodayNewDiaries(nums.current.todayNewDiaries)
+          setTotalSessions(nums.current.totalSessions)
+          setTodayNewSessions(nums.current.todayNewSessions)
+          setAvgMoodScore(nums.current.avgMoodScore)
+        },
+        snap:{
+          totalUsers: 1,
+          activeUsers: 1,
+          totalDiaries: 1,
+          todayNewDiaries:1,
+          totalSessions:1,
+          todayNewSessions:1,
+          avgMoodScore:1,
+        },
+      })
     })
   }, [])
   useEffect(() => {
@@ -216,7 +264,7 @@ export default function DashBoard() {
           }
         ]
       };
-      const {userActivity:activityData} = data
+      const { userActivity: activityData } = data
       const option3: echarts.EChartsOption = {
         title: {
           text: '用户活跃度趋势',
@@ -361,33 +409,33 @@ export default function DashBoard() {
               <Avatar src={users} size={88} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '21%' }}></Avatar>
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>总用户数</div>
-                <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalUsers : ''}</div>
-                <div className=' text-[16px] opacity-60'>活跃用户:{hasdata ? data.systemOverview.activeUsers : ''}</div>
+                <div className=' text-[24px]'>{hasdata ? totalUsers : <Skeleton paragraph={false} active />}</div>
+                <div className=' text-[16px] opacity-60 flex items-center'><span className='mr-3'>活跃用户:</span>{hasdata ? activeUsers : <Skeleton style={{ width: '50px' }} styles={{ title: { height: '20px' } }} paragraph={false} active />}</div>
               </div>
             </div>
           </Card>
         </Col>
         <Col span={6}>
-          <Card hoverable style={{ cursor: 'default' }}>
+          <Card hoverable style={{ cursor: 'default' }} onClick={()=>Nav('/back/emotional')}>
             <div className='flex'>
               <Avatar src={like} size={88} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', borderRadius: '21%' }}></Avatar>
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>情绪日志</div>
-                <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalDiaries : ''}</div>
-                <div className=' text-[16px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewDiaries : ''}</div>
+                <div className=' text-[24px]'>{hasdata ? totalDiaries : <Skeleton paragraph={false} active />}</div>
+                <div className=' text-[16px] opacity-60 flex items-center'><span className='mr-3'>今日新增:</span>{hasdata ? todayNewDiaries : <Skeleton style={{ width: '50px' }} styles={{ title: { height: '20px' } }} paragraph={false} active />}</div>
               </div>
             </div>
 
           </Card>
         </Col>
         <Col span={6}>
-          <Card hoverable style={{ cursor: 'default' }}>
+          <Card hoverable style={{ cursor: 'default' }} onClick={()=>Nav('/back/consultations')}>
             <div className='flex'>
               <Avatar src={comments} size={88} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', borderRadius: '21%' }}></Avatar>
-              <div className='flex flex-col justify-between ml-4'>
+              <div className='flex flex-col justify-between ml-4 '>
                 <div className=' text-[18px] opacity-60'>咨询会话</div>
-                <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalSessions : ''}</div>
-                <div className=' text-[16px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewSessions : ''}</div>
+                <div className=' text-[24px]'>{hasdata ? totalSessions : <Skeleton paragraph={false} active />}</div>
+                <div className=' text-[16px] opacity-60 w-full flex items-center'><span className='mr-3'>今日新增:</span>{hasdata ? todayNewSessions : <Skeleton style={{ width: '50px' }} styles={{ title: { height: '20px' } }} paragraph={false} active />}</div>
               </div>
             </div>
 
@@ -399,7 +447,7 @@ export default function DashBoard() {
               <Avatar src={smile} size={88} style={{ background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', borderRadius: '21%' }}></Avatar>
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>平均情绪</div>
-                <div className=' text-[24px]'>{hasdata ? data.systemOverview.avgMoodScore : ''}/10</div>
+                <div className=' text-[24px] flex items-center'>{hasdata ? avgMoodScore : <Skeleton style={{ width: '30px' }} styles={{ title: { height: '20px' } }} paragraph={false} active />}<span className='ml-3'>/10</span></div>
                 <div className=' text-[16px] opacity-60'>情绪健康指数</div>
               </div>
             </div>
@@ -409,16 +457,18 @@ export default function DashBoard() {
       </Row>
       <Row gutter={20} style={{ marginBottom: '20px' }}>
         <Col span={12}>
-          <Card title='情绪趋势分析' styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '560px' }}>
+          <Card title='情绪趋势分析' styles={{ title: { fontSize: '20px' } }} hoverable style={{ cursor: 'default', height: '560px' }}>
             <div className='flex w-full h-[450px] justify-center items-end '>
               <div id="emotion" className='h-[400px] w-[900px] '>
-
+                {!hasdata && <div className='h-full flex justify-center items-center pb-[30px]'>
+                  <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
+                </div>}
               </div>
             </div>
           </Card>
         </Col>
         <Col span={12}>
-          <Card title='咨询会话统计'  styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '560px' }}>
+          <Card title='咨询会话统计' styles={{ title: { fontSize: '20px' } }} hoverable style={{ cursor: 'default', height: '560px' }}>
             <div className='flex flex-col w-full h-[460px] items-center justify-between'>
               <div className='h-[80px] w-[900px] '>
                 {hasdata &&
@@ -438,17 +488,21 @@ export default function DashBoard() {
                   </div>}
               </div>
               <div id="session" className='h-[360px] w-[900px] '>
-
+                {!hasdata && <div className='h-full flex justify-center items-center pb-[80px]'>
+                  <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
+                </div>}
               </div>
             </div>
           </Card>
         </Col>
       </Row>
       <div>
-        <Card title='用户活跃度趋势'  styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '800px' }}>
+        <Card title='用户活跃度趋势' styles={{ title: { fontSize: '20px' } }} hoverable style={{ cursor: 'default', height: '800px' }}>
           <div className='flex w-full h-[660px] justify-center items-end'>
             <div id="activity" className='h-[600px] w-[2000px]'>
-
+              {!hasdata && <div className='h-full flex justify-center items-center'>
+                <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
+              </div>}
             </div>
           </div>
         </Card>

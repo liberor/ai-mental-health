@@ -1,11 +1,14 @@
-import { Table, Button ,Modal} from "antd"
+import { Table, Button ,Modal, Spin, Skeleton} from "antd"
 import { useEffect, useState } from "react"
 import { getConsultations,getConsultationById } from "@/api/consultations"
 import './Consultations.css'
+import { LoadingOutlined } from "@ant-design/icons"
 
 export default function Consultations() {
   const [consultations, setConsultations] = useState([])
+  const [hasConsultations, setHasConsultations] = useState(false)
   const [consultation, setConsultation] = useState(null)
+  const [hasConsultation, setHasConsultation] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [current, setCurrent] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -14,9 +17,12 @@ export default function Consultations() {
     getConsultations({}).then(res => {
       setConsultations(res.records)
       setTotal(res.total)
+      setHasConsultations(true)
     })
   }, [])
   const handleDetail = (id,row)=>{
+    setIsModalOpen(true)
+    setHasConsultation(false)
     getConsultationById(id).then(res=>{
       setConsultation({
         nickname:row.nickname,
@@ -24,7 +30,7 @@ export default function Consultations() {
         messageCount: row.messageCount,
         list:res
       })
-      setIsModalOpen(true)
+      setHasConsultation(true)
     })
   }
   const dataSource = consultations.map(item => {
@@ -94,7 +100,8 @@ export default function Consultations() {
         <span className='text-2xl font-bold'>咨询记录</span>
       </div>
       <div>
-        <Table dataSource={dataSource} columns={columns} pagination={{
+        {!hasConsultations && <div className='h-[66vh] flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{fontSize:'66px'}} spin/>}></Spin></div> }
+        {hasConsultations && <Table dataSource={dataSource} columns={columns} pagination={{
           current,
           pageSize,
           total,
@@ -103,18 +110,21 @@ export default function Consultations() {
           onChange: (p, ps) => {
             setCurrent(p)
             setPageSize(ps)
+            setHasConsultations(false)
             getConsultations({currentPage: p, size: ps ,emotionTag:''}).then(res => {
               setConsultations(res.records)
               setTotal(res.total)
+              setHasConsultations(true)
             })
           },
         }}>
 
-        </Table>
+        </Table>}
       </div>
-      {consultation && <Modal styles={{title:{fontSize:'22px'}}} open={isModalOpen} width={1400} title='咨询会话详情' onCancel={()=>setIsModalOpen(false)} cancelText='关闭'
+      <Modal styles={{title:{fontSize:'22px'}}} open={isModalOpen} width={1400} title='咨询会话详情' onCancel={()=>setIsModalOpen(false)} cancelText='关闭'
         footer={(_, { CancelBtn }) => <CancelBtn />}>
-          <div className=" h-[70vh]">
+          {!hasConsultation && <div className="pt-6 h-[70vh]"><Skeleton active></Skeleton></div> }
+          {hasConsultation && <div className=" h-[70vh]">
             <div className="m-4 px-4 h-[10vh] flex flex-col justify-evenly text-[16px]" style={{backgroundColor:'#f7faf9',borderRadius:'12px',border:"solid #f7f7f7 2px"}}>
               <div className="flex">
                 <span className="w-[3.6vw]">用户&nbsp;:</span><span>{consultation.nickname}</span>
@@ -131,17 +141,17 @@ export default function Consultations() {
               {consultation.list.map(item=>{
                 return <div key={item.id} className="px-5 py-3 m-3" style={{backgroundColor:item.senderType === 1 ? '#e9f4fa':'#f0faee',borderRadius:'12px',border:"solid #f7f7f7 2px"}}>
                     <div className="flex justify-between mb-2">
-                      <span className=" text-[16px]">{item.senderTypeDesc}</span>
-                      <span className=" opacity-60">{item.createdAt}</span>
+                      <span className=" text-[18px]">{item.senderTypeDesc}</span>
+                      <span className="text-[17px] opacity-60">{item.createdAt}</span>
                     </div>
-                    <div className=" opacity-80">
+                    <div className="text-[16px] opacity-80" >
                       {item.content}
                     </div>
                 </div>
               })}
             </div>
-          </div>
-      </Modal>}
+          </div>}
+      </Modal>
     </div>
   )
 }

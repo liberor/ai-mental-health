@@ -1,7 +1,7 @@
 import { getKnowledgeCategory, getKnowledgeList, createKnowledge, updateKnowledgeStatus, deleteKnowledge, updateKnowledge } from '@/api/knowledge'
 import { getArticle } from "@/api/article"
 import { uploadFile } from '@/api/upload'
-import { App, Button, Form, Input, Select, Table, Modal, Upload } from 'antd'
+import { App, Button, Form, Input, Select, Table, Modal, Upload, Spin } from 'antd'
 import type { UploadProps } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import './Knowledge.css'
@@ -16,6 +16,7 @@ export default function Knowledge() {
   const [form] = Form.useForm()
   const [category, setCategory] = useState([])
   const [records, setRecords] = useState([])
+  const [hasRecords, setHasRecords] = useState(false)
   const [current, setCurrent] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [total, setTotal] = useState(0)
@@ -53,12 +54,15 @@ export default function Knowledge() {
     getKnowledgeList({}).then(res => {
       setRecords(res.records)
       setTotal(res.total)
+      setHasRecords(true)
     })
   }, [])
   const handleSearch = () => {
+    setHasRecords(false)
     getKnowledgeList(params).then(res => {
       setRecords(res.records)
       setTotal(res.total)
+      setHasRecords(true)
     })
   }
   const dataSource = records.map(item => {
@@ -202,9 +206,11 @@ export default function Knowledge() {
         setModalCategoryId(null)
         setModalSummary('')
         setModalTags([])
+        setHasRecords(false)
         getKnowledgeList({}).then(res => {
           setRecords(res.records)
           setTotal(res.total)
+          setHasRecords(true)
         })
       })
     } else {
@@ -228,9 +234,11 @@ export default function Knowledge() {
         setModalCategoryId(null)
         setModalSummary('')
         setModalTags([])
+        setHasRecords(false)
         getKnowledgeList({}).then(res => {
           setRecords(res.records)
           setTotal(res.total)
+          setHasRecords(true)
         })
       })
     }
@@ -241,9 +249,11 @@ export default function Knowledge() {
         type: 'success',
         content: '操作成功'
       })
+      setHasRecords(false)
       getKnowledgeList(params).then(res => {
         setRecords(res.records)
         setTotal(res.total)
+        setHasRecords(true)
       })
     })
   }
@@ -253,9 +263,11 @@ export default function Knowledge() {
         type: 'success',
         content: '删除成功'
       })
+      setHasRecords(false)
       getKnowledgeList(params).then(res => {
         setRecords(res.records)
         setTotal(res.total)
+        setHasRecords(true)
       })
     })
   }
@@ -283,26 +295,28 @@ export default function Knowledge() {
       </div>
       <div className='m-3'>
         <Form style={{ display: 'flex', padding: '10px' }} onFinish={handleSearch}>
-          <Form.Item name='title' label='文章标题'>
-            <Input style={{ width: '250px', marginRight: '20px' }} onChange={(e) => setTitle(e.currentTarget.value)}></Input>
+          <Form.Item label='文章标题'>
+            <Input style={{ width: '250px', marginRight: '20px' }} value={title} onChange={(e) => setTitle(e.currentTarget.value)}></Input>
           </Form.Item>
-          <Form.Item name='categoryId' label='分类'>
+          <Form.Item label='分类'>
             <Select
               style={{ width: '250px', marginRight: '20px' }}
               options={options}
+              value={categoryId}
               onChange={(v) => setCategoryId(v)}
             />
           </Form.Item>
-          <Form.Item name='authorName' label='作者'>
-            <Input style={{ width: '250px', marginRight: '20px' }} onChange={(e) => setAuthorName(e.currentTarget.value)}></Input>
+          <Form.Item label='作者'>
+            <Input style={{ width: '250px', marginRight: '20px' }} value={authorName} onChange={(e) => setAuthorName(e.currentTarget.value)}></Input>
           </Form.Item>
-          <Form.Item name='status' label='状态'>
+          <Form.Item label='状态'>
             <Select
               style={{ width: '250px', marginRight: '20px' }}
               options={[
                 { value: 1, label: '已发布' },
                 { value: 2, label: '已下线' }
               ]}
+              value={status}
               onChange={(v) => setStatus(v)}
             />
           </Form.Item>
@@ -318,7 +332,7 @@ export default function Knowledge() {
         </Form>
       </div>
       <div>
-        <Table dataSource={dataSource} columns={columns} pagination={{
+        {hasRecords && <Table dataSource={dataSource} columns={columns} pagination={{
           current,
           pageSize,
           total,
@@ -327,14 +341,16 @@ export default function Knowledge() {
           onChange: (p, ps) => {
             setCurrent(p)
             setPageSize(ps)
+            setHasRecords(false)
             getKnowledgeList({ ...params, currentPage: p, size: ps }).then(res => {
               setRecords(res.records)
               setTotal(res.total)
+              setHasRecords(true)
             })
           },
         }}>
-
-        </Table>
+        </Table>}
+        {!hasRecords && <div className='h-[66vh] flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{fontSize:'66px'}} spin/>}></Spin></div> }
       </div>
       <Modal closable={false} open={isModalOpen} styles={{ title: { fontSize: '20px' } }} title={isEdit ? '编辑文章' : '新增知识文章'} width={800} 
         okText={isEdit ? '编辑':'新增'}
