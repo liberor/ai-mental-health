@@ -362,7 +362,7 @@ export default function DashBoard() {
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>总用户数</div>
                 <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalUsers : ''}</div>
-                <div className=' text-[14px] opacity-60'>活跃用户:{hasdata ? data.systemOverview.activeUsers : ''}</div>
+                <div className=' text-[16px] opacity-60'>活跃用户:{hasdata ? data.systemOverview.activeUsers : ''}</div>
               </div>
             </div>
           </Card>
@@ -374,7 +374,7 @@ export default function DashBoard() {
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>情绪日志</div>
                 <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalDiaries : ''}</div>
-                <div className=' text-[14px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewDiaries : ''}</div>
+                <div className=' text-[16px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewDiaries : ''}</div>
               </div>
             </div>
 
@@ -387,7 +387,7 @@ export default function DashBoard() {
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>咨询会话</div>
                 <div className=' text-[24px]'>{hasdata ? data.systemOverview.totalSessions : ''}</div>
-                <div className=' text-[14px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewSessions : ''}</div>
+                <div className=' text-[16px] opacity-60'>今日新增:{hasdata ? data.systemOverview.todayNewSessions : ''}</div>
               </div>
             </div>
 
@@ -400,7 +400,7 @@ export default function DashBoard() {
               <div className='flex flex-col justify-between ml-4'>
                 <div className=' text-[18px] opacity-60'>平均情绪</div>
                 <div className=' text-[24px]'>{hasdata ? data.systemOverview.avgMoodScore : ''}/10</div>
-                <div className=' text-[14px] opacity-60'>情绪健康指数</div>
+                <div className=' text-[16px] opacity-60'>情绪健康指数</div>
               </div>
             </div>
 
@@ -409,7 +409,7 @@ export default function DashBoard() {
       </Row>
       <Row gutter={20} style={{ marginBottom: '20px' }}>
         <Col span={12}>
-          <Card title='情绪趋势分析' hoverable style={{ cursor: 'default', height: '560px' }}>
+          <Card title='情绪趋势分析' styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '560px' }}>
             <div className='flex w-full h-[450px] justify-center items-end '>
               <div id="emotion" className='h-[400px] w-[900px] '>
 
@@ -418,7 +418,7 @@ export default function DashBoard() {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title='咨询会话统计' hoverable style={{ cursor: 'default', height: '560px' }}>
+          <Card title='咨询会话统计'  styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '560px' }}>
             <div className='flex flex-col w-full h-[460px] items-center justify-between'>
               <div className='h-[80px] w-[900px] '>
                 {hasdata &&
@@ -445,7 +445,7 @@ export default function DashBoard() {
         </Col>
       </Row>
       <div>
-        <Card title='用户活跃度趋势' hoverable style={{ cursor: 'default', height: '800px' }}>
+        <Card title='用户活跃度趋势'  styles={{title:{fontSize:'20px'}}} hoverable style={{ cursor: 'default', height: '800px' }}>
           <div className='flex w-full h-[660px] justify-center items-end'>
             <div id="activity" className='h-[600px] w-[2000px]'>
 

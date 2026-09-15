@@ -61,6 +61,7 @@
 
 .ant-table-cell {
   vertical-align: middle;
+  font-size: 16px;
 }
 
 ::-webkit-scrollbar {
@@ -81,4 +82,8 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
     cursor: pointer;
+}
+
+.ant-form label {
+  font-size: 17px !important;
 }

@@ -53,7 +53,7 @@ export default function Consultations() {
       width: 1100,
       render: (row) => {
         return (<div>
-          <div className=" text-[16px] font-bold mb-2">
+          <div className=" text-[18px] font-bold mb-2">
             {row.sessionTitle}
           </div>
           <div className=" opacity-80">
@@ -83,7 +83,7 @@ export default function Consultations() {
       key: 'operate',
       align: 'center',
       render: (row) => {
-        return <Button type='text' style={{ color: '#1677ff', marginRight: '10px' ,paddingLeft:'24px'}} onClick={()=>{handleDetail(row.id,row)}}>详情</Button>
+        return <Button type='text' style={{ color: '#1677ff',fontSize:'17px' }} onClick={()=>{handleDetail(row.id,row)}}>详情</Button>
       }
     },
 

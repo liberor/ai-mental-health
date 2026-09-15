@@ -1,8 +1,8 @@
-import { Avatar, Button, Card, Divider, Input, message, Pagination } from 'antd'
+import { Avatar, Button, Card, Divider, Input, message, Pagination, Spin } from 'antd'
 import robot from '@/assets/images/robot-fill.png'
 import users from '@/assets/images/users.png'
 import "./AiConsultation.css"
-import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, EllipsisOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
+import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, EllipsisOutlined, LoadingOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
 import like from '@/assets/images/like.png'
 import { getHistoryList, deleteHistorySession, startNewSession, getHistorySessionMessages, getEmotion } from '@/api/aiconsul'
 import { useEffect, useRef, useState } from 'react'
@@ -33,6 +33,7 @@ const getEmotionScoreColor = (isNegative, score) => {
 
 export default function AiConsultation() {
   const [historyList, setHistoryList] = useState([])
+  const [hasHistoryList, setHasHistoryList] = useState(false)
   const [userMsg, setUserMsg] = useState('')
   const [currentSession, setCurrentSession] = useState(() => ({ id: '', title: '' }))
   const [currentEmotion, setCurrentEmotion] = useState(null)
@@ -44,6 +45,7 @@ export default function AiConsultation() {
   const [current, setCurrent] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [total, setTotal] = useState(0)
+  const [isAiTyping,setIsAiTyping] = useState(false)
   useEffect(() => {
     if (sliceLen === 1 && timer.current == null) {
       timer.current = setInterval(() => setSliceLen((s) => s + 1), 25)
@@ -58,6 +60,7 @@ export default function AiConsultation() {
     getHistoryList({ pageNum: current, pageSize }).then(res => {
       setHistoryList((res && res.records) ?? [])
       setTotal(res.total)
+      setHasHistoryList(true)
     })
     return () => {
       if (timer.current) {
@@ -70,8 +73,9 @@ export default function AiConsultation() {
     deleteHistorySession(id).then(res => {
       message.success('删除成功')
       getHistoryList({ pageNum: current, pageSize }).then(res => {
-        setHistoryList(res.records)
+        setHistoryList((res && res.records) ?? [])
         setTotal(res.total)
+        setHasHistoryList(true)
       })
       if ('session_' + id === currentSession.id) {
         setMessages([])
@@ -90,6 +94,10 @@ export default function AiConsultation() {
   }
   const handleSend = () => {
     if (!userMsg.trim()) return
+    if (isAiTyping) {
+      message.warning('AI回复中,请稍等')
+      return
+    }
     const userMsgCopy = userMsg
     setUserMsg('')
     setMessages(messages => ([...messages, {
@@ -98,6 +106,7 @@ export default function AiConsultation() {
       senderType: 1,
       createdAt: new Date().toISOString()
     }]))
+    setIsAiTyping(true)
     if (!currentSession.id) {
       const dateStrForTitle = `宁渡AI助手 - ${new Date().toLocaleString()}`
       startNewSession(dateStrForTitle, userMsgCopy).then(res => {
@@ -139,10 +148,12 @@ export default function AiConsultation() {
       },
       onmessage: (res) => {
         if (res.event == 'done') {
+          setIsAiTyping(false)
           ctrl.abort()
           getHistoryList({ pageNum: current, pageSize }).then(res => {
             setHistoryList((res && res.records) ?? [])
             setTotal(res.total)
+            setHasHistoryList(true)
           })
           getEmotion(sessionId).then(res => {
             setCurrentEmotion(res)
@@ -166,10 +177,11 @@ export default function AiConsultation() {
         }
       },
       onerror: (err) => {
+        setIsAiTyping(false)
         handleError(err ?? 'AI回复失败')
       },
       onclose: () => {
-
+        setIsAiTyping(false)
       }
     })
   }
@@ -193,7 +205,7 @@ export default function AiConsultation() {
     <div className='ai-consultation w-full h-full px-[16vw] py-[2vh]'>
       <div className=' w-full h-full  flex'>
 
-        <div className=' h-full  mr-6 flex flex-col' style={{ width: isShowHistoryOnly ? '25vw' : '16vw', transition: 'all 0.2s' }}>
+        <div className=' h-full  mr-6 flex flex-col' style={{ width: isShowHistoryOnly ? '16vw' : '16vw', transition: 'all 0.2s' }}>
           {!isShowHistoryOnly && <div className='w-full h-[14vh]  mb-6' >
             <Card hoverable style={{ cursor: 'default', height: '100%' }}>
               <div className=' h-full flex flex-col items-center'>
@@ -244,14 +256,15 @@ export default function AiConsultation() {
               </div>
             </Card>
           </div>}
-          <div className='w-full flex-1 min-h-0' style={{ transition: 'all 1s' }}>
+          <div className='w-full flex-1 min-h-0'>
             <Card hoverable className='history-list' style={{ cursor: 'default', height: '100%' }}>
-              <div className=' h-full  flex flex-col'>
+              {!hasHistoryList && <div className='h-full flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}></Spin></div> }
+              {hasHistoryList && <div className=' h-full  flex flex-col'>
                 <div className='w-full text-xl font-bold flex justify-between'><span>会话历史</span><EllipsisOutlined style={{ fontSize: '28px', cursor: 'pointer' }} onClick={() => setIsShowHistoryOnly((pre) => !pre)} /></div>
                 <Divider></Divider>
                 <div className='w-full flex-1  overflow-auto'>
-                  {historyList.length === 0 && <div className='text-xl font-bold opacity-60 '>没有历史记录...</div>}
-                  {historyList.length > 0 && historyList.map(obj => {
+                  {hasHistoryList && historyList.length === 0 && <div className='text-xl font-bold opacity-60 '>没有历史记录...</div>}
+                  {hasHistoryList && historyList.length > 0 && historyList.map(obj => {
                     return (<div key={obj.id} className='history-list-item mb-3 cursor-pointer p-3' onClick={() => {
                       getHistorySessionMessages(obj.id).then(res => {
                         setMessages(res ?? [])
@@ -267,16 +280,17 @@ export default function AiConsultation() {
                       <div className='text-[16px] opacity-70'><span className='mr-6'><MessageOutlined className='mr-1' />{obj.messageCount}</span><span><ClockCircleOutlined className='mr-1' />{obj.durationMinutes}分钟</span></div>
                     </div>)
                   })}
-                  {historyList.length > 0 && isShowHistoryOnly && <Pagination current={current} pageSize={pageSize} total={total} showSizeChanger={false} onChange={(p, ps) => {
+                  {/* 后端不处理 pageNum, pageSize*/}
+                  {/* {historyList.length > 0 && isShowHistoryOnly && <Pagination current={current} pageSize={pageSize} total={total} showSizeChanger={true} onChange={(p, ps) => {
                     getHistoryList({ pageNum: p, pageSize: ps }).then(res => {
                       setHistoryList((res && res.records) ?? [])
                       setTotal(res.total)
                     })
                     setCurrent(p)
                     setPageSize(ps)
-                  }}></Pagination>}
+                  }}></Pagination>} */}
                 </div>
-              </div>
+              </div>}
             </Card>
           </div>
         </div>

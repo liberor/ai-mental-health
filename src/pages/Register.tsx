@@ -15,12 +15,13 @@ export default function Register() {
   const Nav = useNavigate()
     const { message: messageApi } = App.useApp()
     const onFinish = (values:FormValues)=>{
-        register({...values,gender:0,userType:1}).then(res=>{
+        register({...values,gender:1,userType:1}).then(res=>{
           messageApi.open({
             type:'success',
             content:'注册成功,请返回登录',
-            duration:5000
+            duration:3
           })
+          Nav('/auth/login')
         })
     }
   return (
@@ -38,7 +39,7 @@ export default function Register() {
               <Form.Item name='nickname' >
                 <Input placeholder='昵称(可选)' size='large' style={{marginTop:'2vh'}}></Input>
               </Form.Item>
-              <Form.Item name='phone' rules={[{required:true,message:'请输入手机号'},{pattern:/^1[3-9]\d{9}$/,message:'请输入正确的手机号'}]}>
+              <Form.Item name='phone' rules={[{pattern:/^1[3-9]\d{9}$/,message:'请输入正确的手机号'}]}>
                 <Input placeholder='手机号' size='large' style={{marginTop:'2vh'}}></Input>
               </Form.Item>
               <Form.Item name='password' rules={[{required:true,message:'请输入密码'}]}>

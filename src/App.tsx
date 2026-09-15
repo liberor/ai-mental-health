@@ -1,12 +1,14 @@
 import './App.css'
-import { Layout, Avatar, Tabs, Button, message } from 'antd';
-import { Outlet, useNavigate,useLocation } from 'react-router-dom';
+import { Layout, Avatar, Tabs, Button, App as AntdApp } from 'antd';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import robot from '@/assets/images/机器人.png'
 import { logout } from './api/logout';
 const { Header, Footer, Content } = Layout;
 function App() {
   const Nav = useNavigate()
   const location = useLocation()
+  const rootPathName = '/' + location.pathname.split('/')[1]
+  const { message } = AntdApp.useApp()
   const HasClientAuth = localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')).userType == 1
   const handleLogout = () => {
     logout().then(res => {
@@ -52,7 +54,7 @@ function App() {
             </div>
             <div className='flex items-end h-full'>
               <Tabs
-              activeKey={location.pathname}
+                activeKey={rootPathName}
                 onChange={(key) => Nav(key)}
                 items={[
                   {
@@ -63,11 +65,11 @@ function App() {
                 ]}
               />
               {!HasClientAuth ? <Button type='primary' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px' }} onClick={() => Nav('/auth/register')}>注册</Button>
-                : <Button type='text' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px',padding:'5px 8px', border: "solid #ccc 2px", opacity: "70%" }} onClick={() => handleLogout()}>退出登录</Button>}
+                : <Button type='text' style={{ fontSize: '20px', marginLeft: '48px', marginBottom: '11px', padding: '5px 8px', border: "solid #ccc 2px", opacity: "70%" }} onClick={() => handleLogout()}>退出登录</Button>}
             </div>
           </div>
         </Header>
-        <Content style={{ height: '90vh' ,overflow:"auto"}}>
+        <Content style={{ height: '90vh', overflow: "auto" }}>
           <Outlet></Outlet>
         </Content>
         <Footer style={{ backgroundColor: '#333', height: '4vh' }}>

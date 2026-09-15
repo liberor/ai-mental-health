@@ -110,9 +110,9 @@ export default function Knowledge() {
       key: 'operate',
       render: (_, item) => {
         return (<div>
-          <Button type='text' style={{ color: '#1677ff', marginRight: '10px' }} onClick={() => handleEdit(item)}>编辑</Button>
-          <Button type='text' style={{ color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} onClick={() => handleUpdate(item)}>{item.status === 2 ? '发布' : '下线'}</Button>
-          <Button type='text' style={{ color: '#ff4d4f' }} onClick={() => handleDelete(item)}>删除</Button>
+          <Button type='text' style={{ fontSize:'17px',color: '#1677ff', marginRight: '10px' }} onClick={() => handleEdit(item)}>编辑</Button>
+          <Button type='text' style={{ fontSize:'17px',color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} onClick={() => handleUpdate(item)}>{item.status === 2 ? '发布' : '下线'}</Button>
+          <Button type='text' style={{ fontSize:'17px',color: '#ff4d4f' }} onClick={() => handleDelete(item)}>删除</Button>
         </div>)
       }
     },

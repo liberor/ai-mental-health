@@ -11,6 +11,7 @@ import astonished from '@/assets/images/惊讶.png'
 import confused from '@/assets/images/困惑.png'
 import like from '@/assets/images/like.png'
 import { createOrUpdateDiary } from '@/api/mooddiary'
+import dayjs from 'dayjs'
 
 export default function MoodDiary() {
     const [rate, setRate] = useState(0)
@@ -18,19 +19,19 @@ export default function MoodDiary() {
     const [dominantEmotion, setDominantEmotion] = useState('')
     const [emotionTriggers, setEmotionTriggers] = useState('')
     const [diaryContent, setDiaryContent] = useState('')
-    const [sleepQuality, setSleepQuality] = useState('')
-    const [stressLevel, setStressLevel] = useState('')
+    const [sleepQuality, setSleepQuality] = useState(3)
+    const [stressLevel, setStressLevel] = useState(3)
     const handleReset = () => {
         setRate(0)
         setDominantEmotion('')
         setEmotionTriggers('')
         setDiaryContent('')
-        setSleepQuality('')
-        setStressLevel('')
+        setSleepQuality(3)
+        setStressLevel(3)
         setPicked(false)
     }
     const handleSubmit = ()=>{
-        const body = {moodScore:rate,dominantEmotion,emotionTriggers,diaryContent,sleepQuality,stressLevel,diaryDate:(new Date()).toLocaleDateString().replace(/\//g,'-')}
+        const body = {moodScore:rate,dominantEmotion,emotionTriggers,diaryContent,sleepQuality,stressLevel,diaryDate:dayjs().format('YYYY-MM-DD')}
         createOrUpdateDiary(body).then(res=>{
             if(res) message.success('成功上传')
         })
@@ -111,21 +112,21 @@ export default function MoodDiary() {
                         <Col span={12}>
                             <div className=' text-[16px] my-3'>睡眠质量</div>
                             <Select style={{ width: '100%' }} placeholder='请选择' value={sleepQuality} onChange={(v) => setSleepQuality(v)} options={[
-                                { value: '1', label: '1' },
-                                { value: '2', label: '2' },
-                                { value: '3', label: '3' },
-                                { value: '4', label: '4' },
-                                { value: '5', label: '5' },
+                                { value: 1, label: '1' },
+                                { value: 2, label: '2' },
+                                { value: 3, label: '3' },
+                                { value: 4, label: '4' },
+                                { value: 5, label: '5' },
                             ]}></Select>
                         </Col>
                         <Col span={12}>
                             <div className=' text-[16px] my-3'>压力水平</div>
                             <Select style={{ width: '100%' }} placeholder='请选择' value={stressLevel} onChange={(v) => setStressLevel(v)} options={[
-                                { value: '1', label: '1' },
-                                { value: '2', label: '2' },
-                                { value: '3', label: '3' },
-                                { value: '4', label: '4' },
-                                { value: '5', label: '5' },
+                                { value: 1, label: '1' },
+                                { value: 2, label: '2' },
+                                { value: 3, label: '3' },
+                                { value: 4, label: '4' },
+                                { value: 5, label: '5' },
                             ]}></Select>
                         </Col>
                     </Row>
