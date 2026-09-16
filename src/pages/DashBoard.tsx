@@ -15,7 +15,7 @@ gsap.ticker.fps(52)
 export default function DashBoard() {
   const h = document.documentElement.clientWidth
   const Nav = useNavigate()
-  const [data, setData] = useState(null)
+  const [data, setData] = useState<any>(null)
   const [hasdata, setHasdata] = useState(false)
   const [totalUsers, setTotalUsers] = useState(0)
   const [activeUsers, setActiveUsers] = useState(0)
@@ -34,7 +34,7 @@ export default function DashBoard() {
     avgMoodScore: 0,
   })
   useEffect(() => {
-    getAllData().then(res => {
+    getAllData().then((res:any) => {
       setHasdata(true)
       setData(res)
       gsap.to(nums.current, {
@@ -100,7 +100,7 @@ export default function DashBoard() {
         },
         xAxis: {
           type: 'category',
-          data: data.emotionTrend.map(item => item.date),
+          data: data.emotionTrend.map((item:any) => item.date),
           axisLine: {
             lineStyle: {
               color: '#2d3436',
@@ -132,7 +132,7 @@ export default function DashBoard() {
         series: [
           {
             name: '平均情绪评分',
-            data: data.emotionTrend.map(item => item.avgMoodScore),
+            data: data.emotionTrend.map((item:any) => item.avgMoodScore),
             type: 'line',
             smooth: true,
             lineStyle: {
@@ -145,7 +145,7 @@ export default function DashBoard() {
           },
           {
             name: '记录数量',
-            data: data.emotionTrend.map(item => item.recordCount),
+            data: data.emotionTrend.map((item:any) => item.recordCount),
             type: 'line',
             smooth: true,
             lineStyle: {
@@ -199,7 +199,7 @@ export default function DashBoard() {
         },
         xAxis: {
           type: 'category',
-          data: data.consultationStats.dailyTrend.map(item => item.date),
+          data: data.consultationStats.dailyTrend.map((item:any) => item.date),
           axisLine: {
             lineStyle: {
               color: 'rgba(244, 162, 97, 0.3)'
@@ -229,7 +229,7 @@ export default function DashBoard() {
           {
             name: '会话数量',
             type: 'bar',
-            data: data.consultationStats.dailyTrend.map(item => item.sessionCount),
+            data: data.consultationStats.dailyTrend.map((item:any) => item.sessionCount),
             itemStyle: {
               color: {
                 type: 'linear',
@@ -248,7 +248,7 @@ export default function DashBoard() {
           {
             name: '参与用户数',
             type: 'bar',
-            data: data.consultationStats.dailyTrend.map(item => item.userCount),
+            data: data.consultationStats.dailyTrend.map((item:any) => item.userCount),
             itemStyle: {
               color: {
                 type: 'linear',
@@ -303,7 +303,7 @@ export default function DashBoard() {
         },
         xAxis: {
           type: 'category',
-          data: activityData.map(item => item.date),
+          data: activityData.map((item:any) => item.date),
           axisLine: {
             lineStyle: {
               color: 'rgba(244, 162, 97, 0.3)'
@@ -333,7 +333,7 @@ export default function DashBoard() {
           {
             name: '活跃用户',
             type: 'line',
-            data: activityData.map(item => item.activeUsers),
+            data: activityData.map((item:any) => item.activeUsers),
             smooth: true,
             lineStyle: {
               width: 3,
@@ -359,7 +359,7 @@ export default function DashBoard() {
           {
             name: '新增用户',
             type: 'line',
-            data: activityData.map(item => item.newUsers),
+            data: activityData.map((item:any) => item.newUsers),
             smooth: true,
             lineStyle: {
               width: 3,
@@ -372,7 +372,7 @@ export default function DashBoard() {
           {
             name: '日记用户',
             type: 'line',
-            data: activityData.map(item => item.diaryUsers),
+            data: activityData.map((item:any) => item.diaryUsers),
             smooth: true,
             lineStyle: {
               width: 3,
@@ -385,7 +385,7 @@ export default function DashBoard() {
           {
             name: '咨询用户',
             type: 'line',
-            data: activityData.map(item => item.consultationUsers),
+            data: activityData.map((item:any) => item.consultationUsers),
             smooth: true,
             lineStyle: {
               width: 3,

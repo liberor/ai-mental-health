@@ -44,7 +44,7 @@ export default function BackLayout() {
         '/back/emotional': '情绪日志',
     }
     const handleLogout = () => {
-        logout().then(res => {
+        logout().then(_ => {
             localStorage.removeItem('mental-token')
             localStorage.removeItem('userInfo')
             Nav('/')
@@ -110,7 +110,7 @@ export default function BackLayout() {
                     <div className=' flex justify-between items-center w-full p-5'>
                         <span className=' text-2xl font-bold'>{PathToLabel[current_path as keyof typeof PathToLabel]}</span>
                         <div className=' flex items-center px-5'>
-                            <Avatar src={userInfo.avatar} style={{ backgroundColor: '#0078D4' }}>{userInfo.username?.[0]}</Avatar>
+                            <Avatar src={import.meta.env.VITE_APP_BASE_FILES+userInfo.avatar} style={{ backgroundColor: '#0078D4' }}>{userInfo.username?.[0]}</Avatar>
                             <span className='w-[8px]'></span>
                             <Dropdown menu={{ items: [{ label: (<div className='px-2 text-[16px]' onClick={handleLogout}>退出登录</div>), key: '0' }] }} trigger={['click']} placement='bottom'>
                                 <div className=' cursor-pointer' onClick={() => setDropdown(!dropdown)}>

@@ -2,19 +2,23 @@ import { getArticle } from "@/api/article"
 import { ClockCircleOutlined, FundProjectionScreenOutlined, UserOutlined } from "@ant-design/icons"
 import { Avatar, Card, Divider, Skeleton, Tag } from "antd"
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import book from '@/assets/images/book.png'
 
 
 
 
-
 export default function Article() {
+    const Nav = useNavigate()
     const { id } = useParams()
-    const [article, setArticle] = useState(null)
+    const [article, setArticle] = useState<any>(null)
     const [hasArticle, setHasArticle] = useState(false)
     useEffect(() => {
-        getArticle(id).then(res => {
+        if (!id) {
+            Nav(-1)
+            return
+        }
+        getArticle(id).then((res:any) => {
             setArticle(res)
             setHasArticle(true)
         })
@@ -31,7 +35,7 @@ export default function Article() {
                     {!hasArticle && <div><Skeleton active></Skeleton></div>}
                     {hasArticle && <>
                         <div className="text-xl font-bold mb-3">文章信息</div>
-                        <div className="flex items-center mb-5"><Tag color='blue'>{article.categoryName}</Tag><span className="ml-3"><ClockCircleOutlined style={{ marginRight: '8px' }} />{article.updatedAt}</span></div>
+                        <div className="flex items-center mb-5"><Tag color='blue'>{article!.categoryName}</Tag><span className="ml-3"><ClockCircleOutlined style={{ marginRight: '8px' }} />{article.updatedAt}</span></div>
                         <div className="text-3xl font-bold mb-3">{article.title}</div>
                         <div className="text-[16px] py-2 pl-4 mb-3" style={{ backgroundColor: '#F3FBEB', borderLeft: 'solid #95CD49 5px' }}>{article.summary}</div>
                         <div className="flex items-center text-[16px]"><UserOutlined /><span className="ml-2 mr-8">{article.authorName}</span> <FundProjectionScreenOutlined /><span>&nbsp;&nbsp;{article.readCount}&nbsp;&nbsp;次阅读</span></div>
@@ -48,7 +52,7 @@ export default function Article() {
                         <Divider></Divider>
                         <div className="mb-3 text-[16px]">相关标签</div>
                         <div className="mb-3">
-                            {article.tagArray && article.tagArray.map(item => {
+                            {article.tagArray && article.tagArray.map((item:string) => {
                                 return (<Tag key={item} style={{ marginRight: '10px' }}><span className="text-[15px] opacity-70">{item}</span></Tag>)
                             })}
                         </div>

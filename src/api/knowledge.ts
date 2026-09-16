@@ -12,14 +12,14 @@ export function createKnowledge(data:any){
     return axios.post('/knowledge/article',data)
 }
 
-export function updateKnowledgeStatus(id:any,data:any){
+export function updateKnowledgeStatus(id:string| number,data:any){
     return axios.put(`/knowledge/article/${id}/status`,data)
 }
 
-export function deleteKnowledge(id:any){
+export function deleteKnowledge(id:string| number){
     return axios.delete(`/knowledge/article/${id}`)
 }
 
-export function updateKnowledge(id:any,data:any){
+export function updateKnowledge(id:string| number,data:any){
     return axios.put(`/knowledge/article/${id}`,data)
 }

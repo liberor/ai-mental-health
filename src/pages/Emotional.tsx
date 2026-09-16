@@ -1,4 +1,4 @@
-import { App, Button, Col, Divider, Form, Input, Modal, Popconfirm, Rate, Row, Slider, Spin, Table, Tag } from 'antd'
+import { App, Button, Col, Divider, Form, Input, Modal, Popconfirm, Rate, Row, Slider, Spin, Table, Tag,type TableColumnsType } from 'antd'
 import { getEmotionals, deleteEmotionalById } from '@/api/emotional'
 import { useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
@@ -14,10 +14,10 @@ export default function Emotional() {
   const [userId, setUserId] = useState('')
   const [minMoodScore, setMinMoodScore] = useState(0)
   const [maxMoodScore, setMaxMoodScore] = useState(10)
-  const [currentEmotional, setCurrentEmotional] = useState(null)
+  const [currentEmotional, setCurrentEmotional] = useState<any>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   useEffect(() => {
-    getEmotionals({ current, size }).then(res => {
+    getEmotionals({ current, size }).then((res:any) => {
       setEmotionals(res.records ? res.records : [])
       setTotal(res.total)
       setHasEmotionals(true)
@@ -25,13 +25,13 @@ export default function Emotional() {
   }, [])
   const onFinish = () => {
     setHasEmotionals(false)
-    getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then(res => {
+    getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then((res:any) => {
       setEmotionals(res.records ? res.records : [])
       setTotal(res.total)
       setHasEmotionals(true)
     })
   }
-  const riskTextMap = {
+  const riskTextMap: Record<number, string> = {
     0: '正常',
     1: '关注',
     2: '预警',
@@ -59,7 +59,7 @@ export default function Emotional() {
       aiEmotionAnalysis: item.aiEmotionAnalysis ? JSON.parse(item.aiEmotionAnalysis) : {}
     }
   })
-  const columns = [
+  const columns : TableColumnsType<any> = [
     {
       title: <div className='px-6'>用户id</div>,
       dataIndex: 'userId',
@@ -84,7 +84,7 @@ export default function Emotional() {
       title: <div>情绪评分</div>,
       key: 'moodScore',
       width: h == 1920 ? 320 : 450,
-      render: (row) => {
+      render: (row:any) => {
         return <div>
           <Rate disabled allowHalf defaultValue={row.moodScore} count={10}></Rate>
         </div>
@@ -94,7 +94,7 @@ export default function Emotional() {
       title: <div>生活指标</div>,
       key: 'lifeIndex',
       width: h == 1920 ? 120 : 160,
-      render: (row) => {
+      render: (row:any) => {
         return <div>
           <div>睡眠:{row.sleepQuality ? row.sleepQuality + '/5' : <span className=' opacity-60'>未填写</span>}</div>
           <div>压力:{row.stressLevel ? row.stressLevel + '/5' : <span className=' opacity-60'>未填写</span>}</div>
@@ -105,7 +105,7 @@ export default function Emotional() {
       title: <div>情绪触发因素</div>,
       key: 'emotionTriggers',
       width: h == 1920 ? 300 : 400,
-      render: (row) => {
+      render: (row:any) => {
         return <div className=' text-[16px]'>
           {row.emotionTriggers ? row.emotionTriggers : <span className=' opacity-60'>用户没有填写...</span>}
         </div>
@@ -115,7 +115,7 @@ export default function Emotional() {
       title: <div>日记内容</div>,
       key: 'diaryContent',
       width: h == 1920 ? 300 : 400,
-      render: (row) => {
+      render: (row:any) => {
         return <div className=' text-[16px]'>
           {row.diaryContent ? row.diaryContent : <span className=' opacity-60'>用户没有填写...</span>}
         </div>
@@ -125,15 +125,15 @@ export default function Emotional() {
       title: <div>操作</div>,
       key: 'operate',
       align: 'center',
-      render: (row) => {
+      render: (row:any) => {
         return <div>
           <Button type='text' style={{ color: '#1677ff',fontSize:'17px' }} onClick={() => {
             setCurrentEmotional(row); setIsModalOpen(true)
           }}>详情</Button>
           <Popconfirm title='删除记录' description='确认删除该记录?' onConfirm={() => {
-            deleteEmotionalById(row.id).then(res => {
+            deleteEmotionalById(row.id).then(_ => {
               setHasEmotionals(false)
-              getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then(res => {
+              getEmotionals({ current, size, userId, minMoodScore, maxMoodScore }).then((res:any) => {
                 setEmotionals(res.records ? res.records : [])
                 setTotal(res.total)
                 setHasEmotionals(true)
@@ -190,7 +190,7 @@ export default function Emotional() {
             setCurrent(p)
             setSize(ps)
             setHasEmotionals(false)
-            getEmotionals({ current: p, size: ps, userId, minMoodScore, maxMoodScore }).then(res => {
+            getEmotionals({ current: p, size: ps, userId, minMoodScore, maxMoodScore }).then((res:any) => {
               setEmotionals(res.records ? res.records : [])
               setTotal(res.total)
               setHasEmotionals(true)
@@ -277,7 +277,7 @@ export default function Emotional() {
                 <div className='p-3 text-[18px] font-bold opacity-70'>改善建议</div>
                 <div style={{ border: 'solid #e6e6e6 3px', backgroundColor: '#fff', borderRadius: '8px' }} className='m-3 mt-0 p-3 text-[16px] opacity-60'>
                   <ul>
-                    {currentEmotional.aiEmotionAnalysis.improvementSuggestions.map(item => {
+                    {currentEmotional.aiEmotionAnalysis.improvementSuggestions.map((item:any) => {
                       return (
                         <li key={item}>
                           {item}

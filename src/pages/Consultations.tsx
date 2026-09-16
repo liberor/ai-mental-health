@@ -1,29 +1,28 @@
-import { Table, Button ,Modal, Spin, Skeleton} from "antd"
+import { Table, Button ,Modal, Spin, Skeleton, type TableColumnsType} from "antd"
 import { useEffect, useState } from "react"
 import { getConsultations,getConsultationById } from "@/api/consultations"
-import './Consultations.css'
 import { LoadingOutlined } from "@ant-design/icons"
 
 export default function Consultations() {
-  const [consultations, setConsultations] = useState([])
+  const [consultations, setConsultations] = useState<Array<any>>([])
   const [hasConsultations, setHasConsultations] = useState(false)
-  const [consultation, setConsultation] = useState(null)
+  const [consultation, setConsultation] = useState<any>(null)
   const [hasConsultation, setHasConsultation] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [current, setCurrent] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [total, setTotal] = useState(0)
   useEffect(() => {
-    getConsultations({}).then(res => {
+    getConsultations({}).then((res:any) => {
       setConsultations(res.records)
       setTotal(res.total)
       setHasConsultations(true)
     })
   }, [])
-  const handleDetail = (id,row)=>{
+  const handleDetail = (id:string,row:any)=>{
     setIsModalOpen(true)
     setHasConsultation(false)
-    getConsultationById(id).then(res=>{
+    getConsultationById(id).then((res:any)=>{
       setConsultation({
         nickname:row.nickname,
         startedAt:row.startedAt,
@@ -33,7 +32,7 @@ export default function Consultations() {
       setHasConsultation(true)
     })
   }
-  const dataSource = consultations.map(item => {
+  const dataSource = consultations.map((item:any) => {
     return {
       id: item.id,
       key: item.id,
@@ -45,7 +44,7 @@ export default function Consultations() {
       lastMessageTime: item.lastMessageTime,
     }
   })
-  const columns = [
+  const columns : TableColumnsType<any> = [
     {
       title: <div className='px-6'>会话id</div>,
       dataIndex: 'id',
@@ -57,7 +56,7 @@ export default function Consultations() {
       title: <div className='px-6'>情绪标签</div>,
       key: 'tag',
       width: 1100,
-      render: (row) => {
+      render: (row:any) => {
         return (<div>
           <div className=" text-[18px] font-bold mb-2">
             {row.sessionTitle}
@@ -88,7 +87,7 @@ export default function Consultations() {
       title: <div className='px-6'>操作</div>,
       key: 'operate',
       align: 'center',
-      render: (row) => {
+      render: (row:any) => {
         return <Button type='text' style={{ color: '#1677ff',fontSize:'17px' }} onClick={()=>{handleDetail(row.id,row)}}>详情</Button>
       }
     },
@@ -111,7 +110,7 @@ export default function Consultations() {
             setCurrent(p)
             setPageSize(ps)
             setHasConsultations(false)
-            getConsultations({currentPage: p, size: ps ,emotionTag:''}).then(res => {
+            getConsultations({currentPage: p, size: ps ,emotionTag:''}).then((res:any) => {
               setConsultations(res.records)
               setTotal(res.total)
               setHasConsultations(true)
@@ -138,7 +137,7 @@ export default function Consultations() {
             </div>
             <span className=" text-xl font-bold">对话记录</span>
             <div className="m-4 h-[54vh]" style={{borderRadius:'12px',border:"solid #f7f7f7 2px",overflow:"auto"}}>
-              {consultation.list.map(item=>{
+              {consultation.list.map((item:any)=>{
                 return <div key={item.id} className="px-5 py-3 m-3" style={{backgroundColor:item.senderType === 1 ? '#e9f4fa':'#f0faee',borderRadius:'12px',border:"solid #f7f7f7 2px"}}>
                     <div className="flex justify-between mb-2">
                       <span className=" text-[18px]">{item.senderTypeDesc}</span>

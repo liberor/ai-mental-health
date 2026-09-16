@@ -23,7 +23,7 @@ export default function KnowledgeStorage() {
             sortDirection: 'desc',
             currentPage: '1',
             size: '5'
-        }).then(res => {
+        }).then((res:any) => {
             setRecommends(res.records)
             setHasRecommends(true)
         })
@@ -32,7 +32,7 @@ export default function KnowledgeStorage() {
             sortDirection: 'desc',
             currentPage: current,
             size: pageSize
-        }).then(res => {
+        }).then((res:any) => {
             setBooks(res.records)
             setTotal(res.total)
             setHasBooks(true)
@@ -52,7 +52,7 @@ export default function KnowledgeStorage() {
                             <Spin indicator={<LoadingOutlined style={{ fontSize: '48px' }} spin />}></Spin>
                         </div>}
                         {hasRecommends && <div>
-                            {recommends.map(item => {
+                            {recommends.map((item:any) => {
                                 return (<div key={item.id} className='recommend flex flex-col justify-between my-6 pl-3 cursor-pointer' style={{ borderLeft: 'solid #dfac60 5px' }}
                                     onClick={() => Nav(`/knowledgestorage/article/${item.id}`)}>
                                     <div className='text-[18px] font-bold mb-4'>{item.title}</div>
@@ -65,12 +65,12 @@ export default function KnowledgeStorage() {
                 <div className='flex-1 pb-[100px]'>
                     {!hasBooks && Array.from({length:5},(_,i)=><div key={i} className='mb-13'><Skeleton active></Skeleton></div>) }
                     {hasBooks && <div>
-                        {books.map(item => {
+                        {books.map((item:any) => {
                             return (<div key={item.id} className='mb-6'>
                                 <Card hoverable onClick={() => Nav(`/knowledgestorage/article/${item.id}`)}>
                                     <div className='flex h-[160px]'>
                                         <div className='h-full w-[240px] bg-red-400'>
-                                            <img style={{ width: '240px', height: '160px' }} src={item.coverImage ? 'http://159.75.169.224:1235' + item.coverImage : 'https://file.itndedu.com/psychology_ai.png'}></img>
+                                            <img style={{ width: '240px', height: '160px' }} src={item.coverImage ? import.meta.env.VITE_APP_BASE_FILES + item.coverImage : 'https://file.itndedu.com/psychology_ai.png'}></img>
                                         </div>
                                         <div className='h-full flex-1 pl-3 flex flex-col'>
                                             <div className='text-xl font-bold mb-4 flex items-center'><span className='mr-3'>{item.title}</span><Tag color='blue'>{item.categoryName}</Tag></div>
@@ -91,7 +91,7 @@ export default function KnowledgeStorage() {
                                     sortDirection: 'desc',
                                     currentPage: p,
                                     size: ps
-                                }).then(res => {
+                                }).then((res:any) => {
                                     setBooks(res.records)
                                     setTotal(res.total)
                                     setHasBooks(true)

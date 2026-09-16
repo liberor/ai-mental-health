@@ -13,7 +13,7 @@ export default function Login() {
   const Nav = useNavigate()
   const { message: messageApi } = App.useApp()
   const onFinish = (values: FormValues) => {
-    login(values).then(res => {
+    login(values).then((res:any) => {
       if (!Object.hasOwn(res, 'token') || ('token' in res && res.token == null)) {
         messageApi.open({
           type: 'error',

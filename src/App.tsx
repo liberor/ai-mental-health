@@ -9,9 +9,9 @@ function App() {
   const location = useLocation()
   const rootPathName = '/' + location.pathname.split('/')[1]
   const { message } = AntdApp.useApp()
-  const HasClientAuth = localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')).userType == 1
+  const HasClientAuth = localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 1
   const handleLogout = () => {
-    logout().then(res => {
+    logout().then(_ => {
       localStorage.removeItem('mental-token')
       localStorage.removeItem('userInfo')
       Nav('/')

@@ -4,6 +4,6 @@ export function getConsultations(data:any){
     return axios.get('/psychological-chat/sessions',{params:data})
 }
 
-export function getConsultationById(sessionId:any){
+export function getConsultationById(sessionId:string| number){
     return axios.get(`/psychological-chat/sessions/${sessionId}/messages`)
 }

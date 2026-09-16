@@ -6,7 +6,7 @@ export default function contentToMarkdown(html:string) {
   html = html.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   // 处理代码块（```）
-  html = html.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (match, lang, code) => {
+  html = html.replace(/```(\w+)?\n([\s\S]*?)\n```/g, (_, lang, code) => {
     return `<pre class="code-block"><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`
   })
 

@@ -36,7 +36,7 @@ export default function MoodDiary() {
             if(res) message.success('成功上传')
         })
     }
-    const TextToImage = {
+    const TextToImage: Record<string, string> = {
         '开心': happy,
         '平静': peace,
         '焦虑': anxiety,
@@ -46,7 +46,7 @@ export default function MoodDiary() {
         '惊讶': astonished,
         '困惑': confused,
     }
-    const rateToText = {
+    const rateToText: Record<number, string> = {
         0: '糟糕透顶',
         1: '非常低落',
         2: '很不开心',
@@ -76,7 +76,7 @@ export default function MoodDiary() {
                 </Card>
                 <Card hoverable style={{ marginBottom: '20px', cursor: "default" }}>
                     <div className='text-2xl font-bold mb-5'>主要情绪</div>
-                    <div className='chooseMood' onClick={(e) => {
+                    <div className='chooseMood' onClick={(e:any) => {
                         if (e.target.dataset && e.target.dataset.mood) {
                             setDominantEmotion(e.target.dataset.mood)
                         }

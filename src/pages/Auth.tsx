@@ -10,7 +10,7 @@ export default function Auth() {
                     <h2 className='title text-xl'>心理AI助手</h2>
                     <p className='text text-xl'>每个深夜，每个焦虑的时刻，我们都在这里。不必独自承受，让心与心的连接温暖每一天</p>
                     <div className='robot' >
-                        <Avatar src={robot} size={81}></Avatar>
+                        <Avatar src={robot} size={150}></Avatar>
                     </div>
                 </div>
             </Col>

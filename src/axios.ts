@@ -2,7 +2,7 @@ import axios from "axios";
 import router from "@/router";
 import { message } from "antd";
 const service = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_APP_BASE_API,
     timeout: 5000
 })
 

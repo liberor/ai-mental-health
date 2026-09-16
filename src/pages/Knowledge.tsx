@@ -2,7 +2,7 @@ import { getKnowledgeCategory, getKnowledgeList, createKnowledge, updateKnowledg
 import { getArticle } from "@/api/article"
 import { uploadFile } from '@/api/upload'
 import { App, Button, Form, Input, Select, Table, Modal, Upload, Spin } from 'antd'
-import type { UploadProps } from 'antd'
+import type { TableColumnsType, UploadProps } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import './Knowledge.css'
 import { DeleteOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
@@ -34,7 +34,7 @@ export default function Knowledge() {
   const [modalSummary, setModalSummary] = useState('');
   const [modalTags, setModalTags] = useState([]);
   const [isEdit, setIsEdit] = useState(false)
-  const currentId = useRef(null)
+  const currentId = useRef<any>(null)
   const params = {
     title,
     categoryId,
@@ -49,10 +49,10 @@ export default function Knowledge() {
     '人际关系', '工作压力', '学习方法', '生活技巧'
   ]
   useEffect(() => {
-    getKnowledgeCategory().then(res => {
+    getKnowledgeCategory().then((res:any) => {
       setCategory(res)
     })
-    getKnowledgeList({}).then(res => {
+    getKnowledgeList({}).then((res:any) => {
       setRecords(res.records)
       setTotal(res.total)
       setHasRecords(true)
@@ -60,13 +60,13 @@ export default function Knowledge() {
   }, [])
   const handleSearch = () => {
     setHasRecords(false)
-    getKnowledgeList(params).then(res => {
+    getKnowledgeList(params).then((res:any) => {
       setRecords(res.records)
       setTotal(res.total)
       setHasRecords(true)
     })
   }
-  const dataSource = records.map(item => {
+  const dataSource = records.map((item:any) => {
     return {
       key: item.id,
       title: item.title,
@@ -77,7 +77,7 @@ export default function Knowledge() {
       status: item.status
     }
   })
-  const columns = [
+  const columns : TableColumnsType<any> = [
     {
       title: <div className='px-6'>文章标题</div>,
       dataIndex: 'title',
@@ -122,7 +122,7 @@ export default function Knowledge() {
       }
     },
   ];
-  const options = category.map(item => {
+  const options = category.map((item:any) => {
     return { value: item.id, label: item.categoryName }
   })
   const uploadButton = (
@@ -195,7 +195,7 @@ export default function Knowledge() {
         coverImage: imageUrl,
         content: html,
         id: ''
-      }).then(res => {
+      }).then(_ => {
         messageApi.open({
           type: 'success',
           content: '新增成功'
@@ -208,7 +208,7 @@ export default function Knowledge() {
         setModalSummary('')
         setModalTags([])
         setHasRecords(false)
-        getKnowledgeList({}).then(res => {
+        getKnowledgeList({}).then((res:any) => {
           setRecords(res.records)
           setTotal(res.total)
           setHasRecords(true)
@@ -223,7 +223,7 @@ export default function Knowledge() {
         coverImage: imageUrl,
         content: html,
         id: currentId
-      }).then(res => {
+      }).then(_ => {
         messageApi.open({
           type: 'success',
           content: '编辑成功'
@@ -236,7 +236,7 @@ export default function Knowledge() {
         setModalSummary('')
         setModalTags([])
         setHasRecords(false)
-        getKnowledgeList({}).then(res => {
+        getKnowledgeList({}).then((res:any) => {
           setRecords(res.records)
           setTotal(res.total)
           setHasRecords(true)
@@ -244,39 +244,39 @@ export default function Knowledge() {
       })
     }
   }
-  const handleUpdate = (row) => {
-    updateKnowledgeStatus(row.key, { status: row.status == '2' ? '1' : '2' }).then(res => {
+  const handleUpdate = (row:any) => {
+    updateKnowledgeStatus(row.key, { status: row.status == '2' ? '1' : '2' }).then(_ => {
       messageApi.open({
         type: 'success',
         content: '操作成功'
       })
       setHasRecords(false)
-      getKnowledgeList(params).then(res => {
+      getKnowledgeList(params).then((res:any) => {
         setRecords(res.records)
         setTotal(res.total)
         setHasRecords(true)
       })
     })
   }
-  const handleDelete = (row) => {
-    deleteKnowledge(row.key).then(res => {
+  const handleDelete = (row:any) => {
+    deleteKnowledge(row.key).then(_ => {
       messageApi.open({
         type: 'success',
         content: '删除成功'
       })
       setHasRecords(false)
-      getKnowledgeList(params).then(res => {
+      getKnowledgeList(params).then((res:any) => {
         setRecords(res.records)
         setTotal(res.total)
         setHasRecords(true)
       })
     })
   }
-  const handleEdit = (row) => {
+  const handleEdit = (row:any) => {
     currentId.current = row.key
     setIsEdit(true)
     setIsModalOpen(true)
-    getArticle(row.key).then(res => {
+    getArticle(row.key).then((res:any) => {
       setImageUrl(res.coverImage)
       setHtml(res.content)
       setModalTitle(res.title)
@@ -343,7 +343,7 @@ export default function Knowledge() {
             setCurrent(p)
             setPageSize(ps)
             setHasRecords(false)
-            getKnowledgeList({ ...params, currentPage: p, size: ps }).then(res => {
+            getKnowledgeList({ ...params, currentPage: p, size: ps }).then((res:any) => {
               setRecords(res.records)
               setTotal(res.total)
               setHasRecords(true)
@@ -404,7 +404,7 @@ export default function Knowledge() {
               >
                 {imageUrl ? (
                   <div className=' relative w-full h-full'>
-                    <img draggable={false} src={imageUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img draggable={false} src={import.meta.env.VITE_APP_BASE_FILES+imageUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     <Button
                       type='text'
                       size='small'

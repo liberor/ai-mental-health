@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, Divider, Input, message, Pagination, Spin } from 'antd'
+import { Avatar, Card, Divider, Input, message, Spin } from 'antd'
 import robot from '@/assets/images/robot-fill.png'
 import users from '@/assets/images/users.png'
 import "./AiConsultation.css"
@@ -11,13 +11,13 @@ import dayjs from 'dayjs'
 import contentToMarkdown from '@/utils/contentToMarkdown'
 import GardenDots from '@/components/GardenDots'
 
-const riskTextMap = {
+const riskTextMap: Record<number, string> = {
   0: '正常',
   1: '关注',
   2: '预警',
   3: '危机'
 }
-const getEmotionScoreColor = (isNegative, score) => {
+const getEmotionScoreColor = (isNegative:boolean, score:number) => {
   if (isNegative) {
     if (score <= 40) return '#67c23a'
     if (score <= 60) return '#909399'
@@ -33,19 +33,19 @@ const getEmotionScoreColor = (isNegative, score) => {
 
 export default function AiConsultation() {
   const h = document.documentElement.clientWidth
-  const [historyList, setHistoryList] = useState([])
+  const [historyList, setHistoryList] = useState<Array<any>>([])
   const [hasHistoryList, setHasHistoryList] = useState(false)
   const [userMsg, setUserMsg] = useState('')
   const [currentSession, setCurrentSession] = useState(() => ({ id: '', title: '' }))
-  const [currentEmotion, setCurrentEmotion] = useState(null)
-  const [messages, setMessages] = useState<Array<Object>>([])
+  const [currentEmotion, setCurrentEmotion] = useState<any>(null)
+  const [messages, setMessages] = useState<Array<any>>([])
   const [sliceLen, setSliceLen] = useState(1)
   const helloStr = '您好！我是小暖，您的 AI 心理健康助手。很高兴陪伴您，为您提供温暖的心理支持。请告诉我，今天您感觉怎么样？有什么想要分享的吗？'
-  const timer = useRef(null)
+  const timer = useRef<number | null>(null)
   const [isShowHistoryOnly, setIsShowHistoryOnly] = useState(false)
-  const [current, setCurrent] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const [total, setTotal] = useState(0)
+  const [current, ] = useState(1)
+  const [pageSize, ] = useState(10)
+  const [ , setTotal] = useState(0)
   const [isAiTyping,setIsAiTyping] = useState(false)
   useEffect(() => {
     if (sliceLen === 1 && timer.current == null) {
@@ -58,7 +58,7 @@ export default function AiConsultation() {
   }, [sliceLen])
 
   useEffect(() => {
-    getHistoryList({ pageNum: current, pageSize }).then(res => {
+    getHistoryList({ pageNum: current, pageSize }).then((res : any) => {
       setHistoryList((res && res.records) ?? [])
       setTotal(res.total)
       setHasHistoryList(true)
@@ -70,10 +70,10 @@ export default function AiConsultation() {
       }
     }
   }, [])
-  const handleDeleteHistorySession = (id) => {
-    deleteHistorySession(id).then(res => {
+  const handleDeleteHistorySession = (id : string | number) => {
+    deleteHistorySession(id).then((_) => {
       message.success('删除成功')
-      getHistoryList({ pageNum: current, pageSize }).then(res => {
+      getHistoryList({ pageNum: current, pageSize }).then((res:any) => {
         setHistoryList((res && res.records) ?? [])
         setTotal(res.total)
         setHasHistoryList(true)
@@ -83,7 +83,7 @@ export default function AiConsultation() {
         setCurrentSession({ id: '', title: '' })
         setCurrentEmotion(null)
       }
-    }).catch(err => {
+    }).catch(_ => {
       message.error('删除失败')
     })
   }
@@ -109,8 +109,8 @@ export default function AiConsultation() {
     }]))
     setIsAiTyping(true)
     if (!currentSession.id) {
-      const dateStrForTitle = `宁渡AI助手 - ${new Date().toLocaleString()}`
-      startNewSession(dateStrForTitle, userMsgCopy).then(res => {
+      const dateStrForTitle = `心理健康AI助手 - ${new Date().toLocaleString()}`
+      startNewSession(dateStrForTitle, userMsgCopy).then((res:any) => {
 
         if (res) {
           setCurrentSession({ id: res.sessionId, title: dateStrForTitle })
@@ -123,7 +123,7 @@ export default function AiConsultation() {
       startAiStream(currentSession.id, userMsgCopy)
     }
   }
-  const startAiStream = (sessionId, userMessage) => {
+  const startAiStream = (sessionId:number | string, userMessage : string) => {
     setMessages(messages => ([...messages, {
       id: 'ai_' + Date.now(),
       content: '',
@@ -131,7 +131,7 @@ export default function AiConsultation() {
       createdAt: new Date().toISOString()
     }]))
     const ctrl = new AbortController()
-    fetchEventSource('/api/psychological-chat/stream', {
+    fetchEventSource(import.meta.env.VITE_APP_BASE_API + '/psychological-chat/stream', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ export default function AiConsultation() {
         sessionId, userMessage
       }),
       signal: ctrl.signal,
-      onopen: (res) => {
+      onopen: async (res) => {
         if (res.headers.get('Content-Type') !== 'text/event-stream') {
           message.error('服务器返回非流式数据')
         }
@@ -151,12 +151,12 @@ export default function AiConsultation() {
         if (res.event == 'done') {
           setIsAiTyping(false)
           ctrl.abort()
-          getHistoryList({ pageNum: current, pageSize }).then(res => {
+          getHistoryList({ pageNum: current, pageSize }).then((res:any) => {
             setHistoryList((res && res.records) ?? [])
             setTotal(res.total)
             setHasHistoryList(true)
           })
-          getEmotion(sessionId).then(res => {
+          getEmotion(sessionId).then((res:any) => {
             setCurrentEmotion(res)
           })
           return
@@ -186,7 +186,7 @@ export default function AiConsultation() {
       }
     })
   }
-  const handleError = (error) => {
+  const handleError = (error:any) => {
     setMessages(prev => {
       const last = prev[prev.length - 1]
       return [
@@ -211,7 +211,7 @@ export default function AiConsultation() {
             <Card hoverable style={{ cursor: 'default', height: '100%' }}>
               <div className=' h-full flex flex-col items-center'>
                 <div className='breathing-circle' style={{marginBottom:h==1920?'3px':'12px'}}><Avatar src={robot} size={42}></Avatar></div>
-                <div className='assistant-name' style={{marginBottom:h==1920?'2px':'6px'}}>宁渡AI助手</div>
+                <div className='assistant-name' style={{marginBottom:h==1920?'2px':'6px'}}>健康AI助手</div>
                 <div className='online-status'><span className='status-dot'></span>在线服务中</div>
               </div>
             </Card>
@@ -243,7 +243,7 @@ export default function AiConsultation() {
                 </div>
                 {currentEmotion && currentEmotion.improvementSuggestions && currentEmotion.improvementSuggestions.length > 0 && <div>
                   <div className='text-[18px] font-bold ' style={{marginBottom:h == 1920 ? '8px' : '16px',marginTop:h == 1920 ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
-                  {currentEmotion.improvementSuggestions.map(item => {
+                  {currentEmotion.improvementSuggestions.map((item : string) => {
                     return <div key={item} className='py-1 pl-5 mb-3' style={{ borderRadius: '12px', backgroundColor: '#FDFDF8', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}><span className='text-xl mr-2'>✨</span><span className='text-[15px] ' style={{ color: '#9D9487', fontWeight: '500' }}>{item}</span></div>
                   })}
                 </div>}
@@ -267,7 +267,7 @@ export default function AiConsultation() {
                   {hasHistoryList && historyList.length === 0 && <div className='text-xl font-bold opacity-60 '>没有历史记录...</div>}
                   {hasHistoryList && historyList.length > 0 && historyList.map(obj => {
                     return (<div key={obj.id} className='history-list-item mb-3 cursor-pointer p-3' onClick={() => {
-                      getHistorySessionMessages(obj.id).then(res => {
+                      getHistorySessionMessages(obj.id).then((res:Array<any> | any) => {
                         setMessages(res ?? [])
                         setCurrentSession({ id: 'session_' + obj.id, title: obj.sessionTitle })
                       })
@@ -301,7 +301,7 @@ export default function AiConsultation() {
             <div className='w-full h-[8vh] flex px-6' style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f59e0b 100%)', borderRadius: '18px 18px 0 0' }}>
               <div className='h-full w-[4vw] flex justify-center items-center'><div className='w-[2.5vw] h-[2.5vw] flex justify-center items-center' style={{ backgroundColor: 'rgba(256,256,256,0.25)', borderRadius: '50%' }}><Avatar size={39} src={like}></Avatar></div></div>
               <div className='h-full flex-1 py-5 flex flex-col justify-between'>
-                <div className='text-2xl font-bold opacity-90' style={{ color: 'white' }}>宁渡 AI 助手</div>
+                <div className='text-2xl font-bold opacity-90' style={{ color: 'white' }}>健康 AI 助手</div>
                 <div className='text-xl font-bold opacity-80' style={{ color: 'white' }}>您的贴心 AI 心理健康助手</div>
               </div>
               <div className='h-full w-[5vw] flex justify-center items-center'><div onClick={handleClickPlus} className='w-[1.6vw] h-[1.6vw] flex justify-center items-center cursor-pointer bg-white' style={{ borderRadius: '50%' }}> <PlusOutlined style={{ fontSize: '18px', opacity: "70%" }}></PlusOutlined> </div></div>

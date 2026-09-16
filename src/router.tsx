@@ -41,7 +41,7 @@ const ClientRoutesAuthGuard = () => {
     message.error('请先登录')
     return redirect('/auth/login')
   }
-  if (JSON.parse(localStorage.getItem('userInfo')).userType != 1) {
+  if (JSON.parse(localStorage.getItem('userInfo')!).userType != 1) {
     message.error('请使用用户账号')
     return redirect('/')
   }
@@ -51,7 +51,7 @@ const BackRoutesAuthGuard = () => {
     message.error('请先登录')
     return redirect('/auth/login')
   }
-  if (JSON.parse(localStorage.getItem('userInfo')).userType != 2) {
+  if (JSON.parse(localStorage.getItem('userInfo')!).userType != 2) {
     message.error('非管理员无权访问')
     return redirect('/')
   }
@@ -92,7 +92,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     loader: () => {
-      if (localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')).userType == 2) {
+      if (localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 2) {
         return redirect('/back')
       }
     },

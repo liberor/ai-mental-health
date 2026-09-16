@@ -15,7 +15,7 @@ export default function Register() {
   const Nav = useNavigate()
     const { message: messageApi } = App.useApp()
     const onFinish = (values:FormValues)=>{
-        register({...values,gender:1,userType:1}).then(res=>{
+        register({...values,gender:1,userType:1}).then(_=>{
           messageApi.open({
             type:'success',
             content:'注册成功,请返回登录',
