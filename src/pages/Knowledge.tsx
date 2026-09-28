@@ -49,10 +49,10 @@ export default function Knowledge() {
     '人际关系', '工作压力', '学习方法', '生活技巧'
   ]
   useEffect(() => {
-    getKnowledgeCategory().then((res:any) => {
+    getKnowledgeCategory().then((res: any) => {
       setCategory(res)
     })
-    getKnowledgeList({}).then((res:any) => {
+    getKnowledgeList({}).then((res: any) => {
       setRecords(res.records)
       setTotal(res.total)
       setHasRecords(true)
@@ -60,13 +60,13 @@ export default function Knowledge() {
   }, [])
   const handleSearch = () => {
     setHasRecords(false)
-    getKnowledgeList(params).then((res:any) => {
+    getKnowledgeList(params).then((res: any) => {
       setRecords(res.records)
       setTotal(res.total)
       setHasRecords(true)
     })
   }
-  const dataSource = records.map((item:any) => {
+  const dataSource = records.map((item: any) => {
     return {
       key: item.id,
       title: item.title,
@@ -77,7 +77,7 @@ export default function Knowledge() {
       status: item.status
     }
   })
-  const columns : TableColumnsType<any> = [
+  const columns: TableColumnsType<any> = [
     {
       title: <div className='px-6'>文章标题</div>,
       dataIndex: 'title',
@@ -115,20 +115,20 @@ export default function Knowledge() {
       key: 'operate',
       render: (_, item) => {
         return (<div>
-          <Button type='text' style={{ fontSize:'17px',color: '#1677ff', marginRight: '10px' }} onClick={() => handleEdit(item)}>编辑</Button>
-          <Button type='text' style={{ fontSize:'17px',color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} onClick={() => handleUpdate(item)}>{item.status === 2 ? '发布' : '下线'}</Button>
-          <Button type='text' style={{ fontSize:'17px',color: '#ff4d4f' }} onClick={() => handleDelete(item)}>删除</Button>
+          <Button type='text' style={{ fontSize: '17px', color: '#1677ff', marginRight: '10px' }} onClick={() => handleEdit(item)}>编辑</Button>
+          <Button type='text' style={{ fontSize: '17px', color: item.status === 2 ? '#52c41a' : '#faad14', marginRight: '10px' }} onClick={() => handleUpdate(item)}>{item.status === 2 ? '发布' : '下线'}</Button>
+          <Button type='text' style={{ fontSize: '17px', color: '#ff4d4f' }} onClick={() => handleDelete(item)}>删除</Button>
         </div>)
       }
     },
   ];
-  const options = category.map((item:any) => {
+  const options = category.map((item: any) => {
     return { value: item.id, label: item.categoryName }
   })
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
+    <button style={{ border: 0, background: 'none', cursor: "pointer" }} type="button">
+      {loading ? <LoadingOutlined /> : <PlusOutlined className=' cursor-pointer' />}
+      <div style={{ marginTop: 8 }} className=' cursor-pointer'>Upload</div>
     </button>
   );
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
@@ -208,7 +208,7 @@ export default function Knowledge() {
         setModalSummary('')
         setModalTags([])
         setHasRecords(false)
-        getKnowledgeList({}).then((res:any) => {
+        getKnowledgeList({}).then((res: any) => {
           setRecords(res.records)
           setTotal(res.total)
           setHasRecords(true)
@@ -236,7 +236,7 @@ export default function Knowledge() {
         setModalSummary('')
         setModalTags([])
         setHasRecords(false)
-        getKnowledgeList({}).then((res:any) => {
+        getKnowledgeList({}).then((res: any) => {
           setRecords(res.records)
           setTotal(res.total)
           setHasRecords(true)
@@ -244,39 +244,39 @@ export default function Knowledge() {
       })
     }
   }
-  const handleUpdate = (row:any) => {
+  const handleUpdate = (row: any) => {
     updateKnowledgeStatus(row.key, { status: row.status == '2' ? '1' : '2' }).then(_ => {
       messageApi.open({
         type: 'success',
         content: '操作成功'
       })
       setHasRecords(false)
-      getKnowledgeList(params).then((res:any) => {
+      getKnowledgeList(params).then((res: any) => {
         setRecords(res.records)
         setTotal(res.total)
         setHasRecords(true)
       })
     })
   }
-  const handleDelete = (row:any) => {
+  const handleDelete = (row: any) => {
     deleteKnowledge(row.key).then(_ => {
       messageApi.open({
         type: 'success',
         content: '删除成功'
       })
       setHasRecords(false)
-      getKnowledgeList(params).then((res:any) => {
+      getKnowledgeList(params).then((res: any) => {
         setRecords(res.records)
         setTotal(res.total)
         setHasRecords(true)
       })
     })
   }
-  const handleEdit = (row:any) => {
+  const handleEdit = (row: any) => {
     currentId.current = row.key
     setIsEdit(true)
     setIsModalOpen(true)
-    getArticle(row.key).then((res:any) => {
+    getArticle(row.key).then((res: any) => {
       setImageUrl(res.coverImage)
       setHtml(res.content)
       setModalTitle(res.title)
@@ -290,7 +290,9 @@ export default function Knowledge() {
       <div className='flex justify-between items-center p-3'>
         <span className='text-2xl font-bold'>知识文章</span>
         <span>
-          <Button type='primary' style={{ marginRight: '8px' }} onClick={() => { setBusinessId(crypto.randomUUID()); setImageUrl(undefined); setIsModalOpen(true); setShowPreview(false); setIsEdit(false) }}>新增</Button>
+          <Button type='primary' style={{ marginRight: '8px' }} onClick={() => {
+            setBusinessId(crypto.randomUUID()); setImageUrl(undefined); setIsModalOpen(true); setShowPreview(false); setIsEdit(false); setHtml(''); setModalTitle(''); setModalCategoryId(null); setModalSummary(''); setModalTags([])
+          }}>新增</Button>
 
         </span>
       </div>
@@ -343,7 +345,7 @@ export default function Knowledge() {
             setCurrent(p)
             setPageSize(ps)
             setHasRecords(false)
-            getKnowledgeList({ ...params, currentPage: p, size: ps }).then((res:any) => {
+            getKnowledgeList({ ...params, currentPage: p, size: ps }).then((res: any) => {
               setRecords(res.records)
               setTotal(res.total)
               setHasRecords(true)
@@ -351,10 +353,10 @@ export default function Knowledge() {
           },
         }}>
         </Table>}
-        {!hasRecords && <div className='h-[66vh] flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{fontSize:'66px'}} spin/>}></Spin></div> }
+        {!hasRecords && <div className='h-[66vh] flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{ fontSize: '66px' }} spin />}></Spin></div>}
       </div>
-      <Modal closable={false} open={isModalOpen} styles={{ title: { fontSize: '20px' } }} title={isEdit ? '编辑文章' : '新增知识文章'} width={800} 
-        okText={isEdit ? '编辑':'新增'}
+      <Modal closable={false} open={isModalOpen} styles={{ title: { fontSize: '20px' } }} title={isEdit ? '编辑文章' : '新增知识文章'} width={800}
+        okText={isEdit ? '编辑' : '新增'}
         onCancel={() => setIsModalOpen(false)}
         onOk={handleSubmit}
         footer={(_, { OkBtn, CancelBtn }) => (
@@ -404,7 +406,7 @@ export default function Knowledge() {
               >
                 {imageUrl ? (
                   <div className=' relative w-full h-full'>
-                    <img draggable={false} src={import.meta.env.VITE_APP_BASE_FILES+imageUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img draggable={false} src={import.meta.env.VITE_APP_BASE_FILES + imageUrl} alt="cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     <Button
                       type='text'
                       size='small'

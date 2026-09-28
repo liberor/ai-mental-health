@@ -38,12 +38,14 @@ service.interceptors.response.use(
         }
     },
     (err) => {
-        // if(err.status === 403){
-        //     message.error('登录过期,请重新登录')
-        //     localStorage.removeItem('mental-token')
-        //     localStorage.removeItem('userInfo')
-        //     window.location.replace('/auth/login')
-        // }
+        if(err.status === 403){
+            message.error('登录过期,请重新登录')
+            localStorage.removeItem('mental-token')
+            localStorage.removeItem('userInfo')
+            setTimeout(() => {
+                window.location.replace('/auth/login')
+            }, 3000);
+        }
         return Promise.reject(err)
     }
 )
