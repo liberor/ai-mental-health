@@ -2,7 +2,7 @@ import { getBooks } from '@/api/knowledgeStorage'
 import book from '@/assets/images/book.png'
 import { BarChartOutlined, ClockCircleOutlined, FundProjectionScreenOutlined, LoadingOutlined, UserOutlined } from '@ant-design/icons'
 import { Avatar, Card, Pagination, Skeleton, Spin, Tag } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './KnowledgeStorage.css'
 import { useNavigate } from 'react-router-dom'
 
@@ -16,6 +16,7 @@ export default function KnowledgeStorage() {
     const [hasRecommends, setHasRecommends] = useState(false)
     const [books, setBooks] = useState([])
     const [hasBooks, setHasBooks] = useState(false)
+    const observer = useRef<IntersectionObserver | null>(null)
     const Nav = useNavigate()
     useEffect(() => {
         getBooks({
@@ -37,24 +38,29 @@ export default function KnowledgeStorage() {
             setTotal(res.total)
             setHasBooks(true)
         })
-    }, [])
-    useEffect(()=>{
-        document.querySelectorAll('img[data-src]').forEach(img => observer.observe(img))
-    })
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-            if (e.isIntersecting) {
-                const img : any = e.target
-                img.src = img.dataset.src
-                observer.unobserve(img)  
-            }
+
+        observer.current = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    const img: any = e.target
+                    img.src = img.dataset.src
+                    observer.current?.unobserve(img)
+                }
+            })
+        }, {
+            root: null,
+            rootMargin: '100px',
+
         })
-    },{
-        root:null,
-        rootMargin:'100px',
-        
-    })
-    
+        return ()=> {
+            if(observer.current) observer.current.disconnect()
+        }
+    }, [])
+    useEffect(() => {
+        document.querySelectorAll('img[data-src]').forEach(img => observer.current?.observe(img))
+    },[books])
+
+
     return (
         <div className='knowledge-storage'>
             <div className='h-[12vh] pt-6 pl-9' style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #8b5cf6 100%)' }}>

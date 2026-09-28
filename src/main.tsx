@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider, App as AntdApp } from 'antd'
 import zhCN from 'antd/locale/zh_CN'
@@ -29,7 +29,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ConfigProvider locale={zhCN}>
       <AntdApp message={messageConfig}>
-        <RouterProvider router={router} />
+        <Suspense fallback={<div></div>}>
+          <RouterProvider router={router} />
+        </Suspense>
       </AntdApp>
     </ConfigProvider>
   </StrictMode>,

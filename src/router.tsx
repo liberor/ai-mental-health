@@ -1,20 +1,22 @@
 import { createBrowserRouter, Navigate, redirect } from 'react-router-dom'
+import { lazy } from 'react'
 import App from '@/App'
 import BackLayout from '@/components/BackLayout'
-import DashBoard from '@/pages/DashBoard'
-import Knowledge from '@/pages/Knowledge'
-import Consultations from '@/pages/Consultations'
-import Emotional from '@/pages/Emotional'
-import NotFound from './pages/NotFound'
 import Auth from './pages/Auth'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Home from './pages/Home'
 import { message } from 'antd'
-import AiConsultation from './pages/AiConsultation'
-import MoodDiary from './pages/MoodDiary'
-import KnowledgeStorage from './pages/KnowledgeStorage'
-import Article from './pages/Article'
+const DashBoard = lazy(()=>import('@/pages/DashBoard'))
+const Knowledge = lazy(()=>import('@/pages/Knowledge'))
+const Consultations = lazy(()=>import('@/pages/Consultations'))
+const Emotional = lazy(()=>import('@/pages/Emotional'))
+const NotFound = lazy(()=>import('./pages/NotFound'))
+const Login = lazy(()=>import('./pages/Login'))
+const Register = lazy(()=>import('./pages/Register'))
+const Home = lazy(()=>import('./pages/Home'))
+const AiConsultation = lazy(()=>import('./pages/AiConsultation'))
+const MoodDiary = lazy(()=>import('./pages/MoodDiary'))
+const KnowledgeStorage = lazy(()=>import('./pages/KnowledgeStorage'))
+const Article = lazy(()=>import('./pages/Article'))
+
 
 const AuthRoutes = [
   {
