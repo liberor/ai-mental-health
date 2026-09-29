@@ -2,7 +2,7 @@ import { Avatar, Card, Divider, Input, message, Spin } from 'antd'
 import robot from '@/assets/images/robot-fill.png'
 import users from '@/assets/images/users.png'
 import "./AiConsultation.css"
-import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, EllipsisOutlined, LoadingOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
+import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, DownCircleFilled, DownCircleOutlined, EllipsisOutlined, LoadingOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
 import like from '@/assets/images/like.png'
 import { getHistoryList, deleteHistorySession, startNewSession, getHistorySessionMessages, getEmotion } from '@/api/aiconsul'
 import { useEffect, useRef, useState } from 'react'
@@ -47,6 +47,7 @@ export default function AiConsultation() {
   const [pageSize,] = useState(10)
   const [, setTotal] = useState(0)
   const [isAiTyping, setIsAiTyping] = useState(false)
+  const [showHint, setShowHint] = useState(false)
   const container = useRef<HTMLElement | null>(null)
   const selfScrolled = useRef<boolean>(false)
   const userScrolled = useRef<boolean>(false)
@@ -71,6 +72,12 @@ export default function AiConsultation() {
     container.current?.addEventListener('scroll', () => {
       if (selfScrolled.current) return
       userScrolled.current = true
+      const el = container.current
+      if(el && el.scrollTop + el.clientHeight + 300 < el.scrollHeight){
+        setShowHint(true)
+      }else{
+        setShowHint(false)
+      }
     })
     container.current?.addEventListener('scrollend', () => {
       selfScrolled.current = false
@@ -324,7 +331,7 @@ export default function AiConsultation() {
           </div>
         </div>
 
-        <div className='flex-1 h-full chat-main'>
+        <div className='flex-1 h-full chat-main relative'>
           <Card hoverable style={{ cursor: 'default', height: '100%' }} >
             <div className='w-full h-[8vh] flex px-6' style={{ background: 'linear-gradient(135deg, #fb923c 0%, #f59e0b 100%)', borderRadius: '18px 18px 0 0' }}>
               <div className='h-full w-[4vw] flex justify-center items-center'><div className='w-[2.5vw] h-[2.5vw] flex justify-center items-center' style={{ backgroundColor: 'rgba(256,256,256,0.25)', borderRadius: '50%' }}><Avatar size={39} src={like}></Avatar></div></div>
@@ -362,6 +369,7 @@ export default function AiConsultation() {
                 }
               })
               }
+              <div className=' absolute bottom-[20vh] ' style={{left:'50%',transform:"translateX(-50%)"}}><DownCircleFilled style={{transition:'all 0.5s',fontSize:'36px',color:'#666',backgroundColor:'#fff',opacity: showHint ? "1" : "0",cursor:showHint ? "pointer":'default'}} onClick={()=>{if(showHint){container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })}}}/></div>
             </div>
             <div className='w-full h-[18vh] flex p-6' style={{ borderRadius: '0 0 18px 18px', borderTop: 'solid 1px #ddd' }}>
               <div className='flex-1 h-full'>
