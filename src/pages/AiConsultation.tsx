@@ -17,7 +17,7 @@ const riskTextMap: Record<number, string> = {
   2: '预警',
   3: '危机'
 }
-const getEmotionScoreColor = (isNegative:boolean, score:number) => {
+const getEmotionScoreColor = (isNegative: boolean, score: number) => {
   if (isNegative) {
     if (score <= 40) return '#67c23a'
     if (score <= 60) return '#909399'
@@ -43,10 +43,14 @@ export default function AiConsultation() {
   const helloStr = '您好！我是小暖，您的 AI 心理健康助手。很高兴陪伴您，为您提供温暖的心理支持。请告诉我，今天您感觉怎么样？有什么想要分享的吗？'
   const timer = useRef<number | null>(null)
   const [isShowHistoryOnly, setIsShowHistoryOnly] = useState(false)
-  const [current, ] = useState(1)
-  const [pageSize, ] = useState(10)
-  const [ , setTotal] = useState(0)
-  const [isAiTyping,setIsAiTyping] = useState(false)
+  const [current,] = useState(1)
+  const [pageSize,] = useState(10)
+  const [, setTotal] = useState(0)
+  const [isAiTyping, setIsAiTyping] = useState(false)
+  const container = useRef<HTMLElement | null>(null)
+  const selfScrolled = useRef<boolean>(false)
+  const userScrolled = useRef<boolean>(false)
+  const timer_scroll = useRef<null | number>(null)
   useEffect(() => {
     if (sliceLen === 1 && timer.current == null) {
       timer.current = setInterval(() => setSliceLen((s) => s + 1), 25)
@@ -58,10 +62,18 @@ export default function AiConsultation() {
   }, [sliceLen])
 
   useEffect(() => {
-    getHistoryList({ pageNum: current, pageSize }).then((res : any) => {
+    getHistoryList({ pageNum: current, pageSize }).then((res: any) => {
       setHistoryList((res && res.records) ?? [])
       setTotal(res.total)
       setHasHistoryList(true)
+    })
+    container.current = document.getElementById('chat-container')
+    container.current?.addEventListener('scroll', () => {
+      if (selfScrolled.current) return
+      userScrolled.current = true
+    })
+    container.current?.addEventListener('scrollend', () => {
+      selfScrolled.current = false
     })
     return () => {
       if (timer.current) {
@@ -69,11 +81,17 @@ export default function AiConsultation() {
         timer.current = null
       }
     }
+
   }, [])
-  const handleDeleteHistorySession = (id : string | number) => {
+  useEffect(() => {
+    if (userMsg == '') {
+      container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
+    }
+  }, [userMsg])
+  const handleDeleteHistorySession = (id: string | number) => {
     deleteHistorySession(id).then((_) => {
       message.success('删除成功')
-      getHistoryList({ pageNum: current, pageSize }).then((res:any) => {
+      getHistoryList({ pageNum: current, pageSize }).then((res: any) => {
         setHistoryList((res && res.records) ?? [])
         setTotal(res.total)
         setHasHistoryList(true)
@@ -110,7 +128,7 @@ export default function AiConsultation() {
     setIsAiTyping(true)
     if (!currentSession.id) {
       const dateStrForTitle = `心理健康AI助手 - ${new Date().toLocaleString()}`
-      startNewSession(dateStrForTitle, userMsgCopy).then((res:any) => {
+      startNewSession(dateStrForTitle, userMsgCopy).then((res: any) => {
 
         if (res) {
           setCurrentSession({ id: res.sessionId, title: dateStrForTitle })
@@ -123,7 +141,7 @@ export default function AiConsultation() {
       startAiStream(currentSession.id, userMsgCopy)
     }
   }
-  const startAiStream = (sessionId:number | string, userMessage : string) => {
+  const startAiStream = (sessionId: number | string, userMessage: string) => {
     setMessages(messages => ([...messages, {
       id: 'ai_' + Date.now(),
       content: '',
@@ -146,17 +164,18 @@ export default function AiConsultation() {
         if (res.headers.get('Content-Type') !== 'text/event-stream') {
           message.error('服务器返回非流式数据')
         }
+        userScrolled.current = false
       },
       onmessage: (res) => {
         if (res.event == 'done') {
           setIsAiTyping(false)
           ctrl.abort()
-          getHistoryList({ pageNum: current, pageSize }).then((res:any) => {
+          getHistoryList({ pageNum: current, pageSize }).then((res: any) => {
             setHistoryList((res && res.records) ?? [])
             setTotal(res.total)
             setHasHistoryList(true)
           })
-          getEmotion(sessionId).then((res:any) => {
+          getEmotion(sessionId).then((res: any) => {
             setCurrentEmotion(res)
           })
           return
@@ -173,6 +192,15 @@ export default function AiConsultation() {
             ]
           })
         }
+        if (!userScrolled.current) {
+          if (!timer_scroll.current) {
+            timer_scroll.current = setTimeout(() => {
+              selfScrolled.current = true
+              container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
+              timer_scroll.current = null
+            }, 600);
+          }
+        }
         if (payload.code.toString() !== '200') {
           handleError(payload.message ?? 'AI回复失败')
         }
@@ -186,7 +214,7 @@ export default function AiConsultation() {
       }
     })
   }
-  const handleError = (error:any) => {
+  const handleError = (error: any) => {
     setMessages(prev => {
       const last = prev[prev.length - 1]
       return [
@@ -210,8 +238,8 @@ export default function AiConsultation() {
           {!isShowHistoryOnly && <div className='w-full h-[14vh]  mb-6' >
             <Card hoverable style={{ cursor: 'default', height: '100%' }}>
               <div className=' h-full flex flex-col items-center'>
-                <div className='breathing-circle' style={{marginBottom:h==1920?'3px':'12px'}}><Avatar src={robot} size={42}></Avatar></div>
-                <div className='assistant-name' style={{marginBottom:h==1920?'2px':'6px'}}>健康AI助手</div>
+                <div className='breathing-circle' style={{ marginBottom: h == 1920 ? '3px' : '12px' }}><Avatar src={robot} size={42}></Avatar></div>
+                <div className='assistant-name' style={{ marginBottom: h == 1920 ? '2px' : '6px' }}>健康AI助手</div>
                 <div className='online-status'><span className='status-dot'></span>在线服务中</div>
               </div>
             </Card>
@@ -220,12 +248,12 @@ export default function AiConsultation() {
             <Card hoverable style={{ cursor: 'default', background: ' linear-gradient(135deg, #fef9e7 0%, #fcf4e6 50%, #f6f0e8 100%)' }}>
               <div>
                 <div className='text-xl font-bold' style={{ color: '#8b4513' }}>情绪花园</div>
-                <div className='h-[15vh] flex flex-col items-center' style={{paddingTop:h == 1920 ? '0px' : '12px'}}>
-                  <div className='emotion-info ' style={{marginBottom:h == 1920 ? '0px' : '12px'}}>
+                <div className='h-[15vh] flex flex-col items-center' style={{ paddingTop: h == 1920 ? '0px' : '12px' }}>
+                  <div className='emotion-info ' style={{ marginBottom: h == 1920 ? '0px' : '12px' }}>
                     <div className='text-[18px] font-bold'>{currentEmotion == null ? "中性" : (currentEmotion.isNegative ? '消极' : '积极')}</div>
-                    <div className='text-[18px] font-bold' style={{ color: currentEmotion ? getEmotionScoreColor(currentEmotion.isNegative,currentEmotion.emotionScore) : 'white' }}>{currentEmotion == null ? "50" : currentEmotion.emotionScore}</div>
+                    <div className='text-[18px] font-bold' style={{ color: currentEmotion ? getEmotionScoreColor(currentEmotion.isNegative, currentEmotion.emotionScore) : 'white' }}>{currentEmotion == null ? "50" : currentEmotion.emotionScore}</div>
                   </div>
-                  <div className='flex justify-center items-center' style={{marginBottom:h == 1920 ? '5px' : '12px',marginTop:h == 1920 ? '5px' : '0px'}}>
+                  <div className='flex justify-center items-center' style={{ marginBottom: h == 1920 ? '5px' : '12px', marginTop: h == 1920 ? '5px' : '0px' }}>
                     <span className='text-[16px] mr-3 opacity-80'>今天感觉</span>
                     <span className='text-xl font-bold'>{currentEmotion == null ? "很不错" : currentEmotion.primaryEmotion}</span>
                   </div>
@@ -242,8 +270,8 @@ export default function AiConsultation() {
                   </div>
                 </div>
                 {currentEmotion && currentEmotion.improvementSuggestions && currentEmotion.improvementSuggestions.length > 0 && <div>
-                  <div className='text-[18px] font-bold ' style={{marginBottom:h == 1920 ? '8px' : '16px',marginTop:h == 1920 ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
-                  {currentEmotion.improvementSuggestions.map((item : string) => {
+                  <div className='text-[18px] font-bold ' style={{ marginBottom: h == 1920 ? '8px' : '16px', marginTop: h == 1920 ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
+                  {currentEmotion.improvementSuggestions.map((item: string) => {
                     return <div key={item} className='py-1 pl-5 mb-3' style={{ borderRadius: '12px', backgroundColor: '#FDFDF8', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}><span className='text-xl mr-2'>✨</span><span className='text-[15px] ' style={{ color: '#9D9487', fontWeight: '500' }}>{item}</span></div>
                   })}
                 </div>}
@@ -259,7 +287,7 @@ export default function AiConsultation() {
           </div>}
           <div className='w-full flex-1 min-h-0'>
             <Card hoverable className='history-list' style={{ cursor: 'default', height: '100%' }}>
-              {!hasHistoryList && <div className='h-full flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}></Spin></div> }
+              {!hasHistoryList && <div className='h-full flex justify-center items-center'><Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />}></Spin></div>}
               {hasHistoryList && <div className=' h-full  flex flex-col'>
                 <div className='w-full text-xl font-bold flex justify-between'><span>会话历史</span><EllipsisOutlined style={{ fontSize: '28px', cursor: 'pointer' }} onClick={() => setIsShowHistoryOnly((pre) => !pre)} /></div>
                 <Divider></Divider>
@@ -267,7 +295,7 @@ export default function AiConsultation() {
                   {hasHistoryList && historyList.length === 0 && <div className='text-xl font-bold opacity-60 '>没有历史记录...</div>}
                   {hasHistoryList && historyList.length > 0 && historyList.map(obj => {
                     return (<div key={obj.id} className='history-list-item mb-3 cursor-pointer p-3' onClick={() => {
-                      getHistorySessionMessages(obj.id).then((res:Array<any> | any) => {
+                      getHistorySessionMessages(obj.id).then((res: Array<any> | any) => {
                         setMessages(res ?? [])
                         setCurrentSession({ id: 'session_' + obj.id, title: obj.sessionTitle })
                       })
@@ -306,7 +334,7 @@ export default function AiConsultation() {
               </div>
               <div className='h-full w-[5vw] flex justify-center items-center'><div onClick={handleClickPlus} className='w-[1.6vw] h-[1.6vw] flex justify-center items-center cursor-pointer bg-white' style={{ borderRadius: '50%' }}> <PlusOutlined style={{ fontSize: '18px', opacity: "70%" }}></PlusOutlined> </div></div>
             </div>
-            <div className='w-full flex-1 overflow-auto p-6'>
+            <div className=' w-full flex-1 overflow-auto p-6' id="chat-container">
               {messages.length === 0 && <div className='flex'>
                 <div className='breathing-circle-chat-avatar mr-5'><Avatar src={robot} size={25}></Avatar></div>
                 <div className='text-[18px] opacity-90 font-bold break-words p-3 relative' style={{ maxWidth: '33vw', borderRadius: '12px', border: 'solid #eee 1px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
@@ -314,7 +342,7 @@ export default function AiConsultation() {
                   <span className=' absolute text-[16px] opacity-50' style={{ bottom: '-25px', left: '0' }}>刚刚</span>
                 </div>
               </div>}
-              {messages.length > 0 && messages.map(obj => {
+              {messages.length > 0 && messages.map((obj,index) => {
                 if (obj.senderType == 1) {
                   return <div key={obj.id} className='flex justify-end mb-12'>
                     <div className='text-[18px] opacity-90 font-bold break-words p-3 relative' style={{ maxWidth: '33vw', borderRadius: '12px', border: 'solid #eee 1px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
@@ -327,8 +355,8 @@ export default function AiConsultation() {
                   return <div key={obj.id} className='flex mb-12'>
                     <div className='breathing-circle-chat-avatar mr-5'><Avatar src={robot} size={25}></Avatar></div>
                     <div className='text-[18px] opacity-90 font-bold break-words p-3 relative' style={{ maxWidth: '33vw', borderRadius: '12px', border: 'solid #eee 1px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-                      <div className='ai-markdown' dangerouslySetInnerHTML={{ __html: contentToMarkdown(obj.content) }}></div>
-                      <span className=' absolute text-[16px] opacity-50 whitespace-nowrap' style={{ bottom: '-25px', left: '0' }}>{obj.content && dayjs(obj.createdAt).format('YYYY-MM-DD HH:mm:ss')}</span>
+                      <div className='ai-markdown' dangerouslySetInnerHTML={{ __html: contentToMarkdown(obj.content == '' ? 'AI思考中,请稍候...' : obj.content) }}></div>
+                      {(index != messages.length-1 || isAiTyping == false) && <span className=' absolute text-[16px] opacity-50 whitespace-nowrap' style={{ bottom: '-25px', left: '0' }}>{obj.content && dayjs(obj.createdAt).format('YYYY-MM-DD HH:mm:ss')}</span>}
                     </div>
                   </div>
                 }

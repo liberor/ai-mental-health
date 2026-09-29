@@ -27,6 +27,18 @@ export default function BackLayout() {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
     useEffect(() => {
+        function handleResize() {
+            if (window.innerWidth < 1900 || window.innerWidth > 2600) {
+                Nav('/suitable', { replace: true })
+            }
+        }
+        window.addEventListener('resize', handleResize)
+        handleResize()
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
+    useEffect(() => {
         let timer = null
         if (collapsed) {
             setShowTitle(false)
@@ -110,7 +122,7 @@ export default function BackLayout() {
                     <div className=' flex justify-between items-center w-full p-5'>
                         <span className=' text-2xl font-bold'>{PathToLabel[current_path as keyof typeof PathToLabel]}</span>
                         <div className=' flex items-center px-5'>
-                            <Avatar src={import.meta.env.VITE_APP_BASE_FILES+userInfo.avatar} style={{ backgroundColor: '#0078D4' }}>{userInfo.username?.[0]}</Avatar>
+                            <Avatar src={import.meta.env.VITE_APP_BASE_FILES + userInfo.avatar} style={{ backgroundColor: '#0078D4' }}>{userInfo.username?.[0]}</Avatar>
                             <span className='w-[8px]'></span>
                             <Dropdown menu={{ items: [{ label: (<div className='px-2 text-[16px]' onClick={handleLogout}>退出登录</div>), key: '0' }] }} trigger={['click']} placement='bottom'>
                                 <div className=' cursor-pointer' onClick={() => setDropdown(!dropdown)}>

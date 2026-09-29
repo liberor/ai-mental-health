@@ -4,6 +4,7 @@ import App from '@/App'
 import BackLayout from '@/components/BackLayout'
 import Auth from './pages/Auth'
 import { message } from 'antd'
+import Suitable from './pages/Suitable'
 const DashBoard = lazy(()=>import('@/pages/DashBoard'))
 const Knowledge = lazy(()=>import('@/pages/Knowledge'))
 const Consultations = lazy(()=>import('@/pages/Consultations'))
@@ -22,6 +23,11 @@ const AuthRoutes = [
   {
     path: '/auth',
     element: <Auth />,
+    loader:()=>{
+      if(window.innerWidth < 1920){
+        return redirect('/suitable')
+      }
+    },
     children: [
       {
         index: true,
@@ -39,6 +45,9 @@ const AuthRoutes = [
   }
 ]
 const ClientRoutesAuthGuard = () => {
+  if(window.innerWidth < 1920){
+        return redirect('/suitable')
+      }
   if (localStorage.getItem('mental-token') === null || localStorage.getItem('userInfo') === null) {
     message.error('请先登录')
     return redirect('/auth/login')
@@ -49,6 +58,9 @@ const ClientRoutesAuthGuard = () => {
   }
 }
 const BackRoutesAuthGuard = () => {
+  if(window.innerWidth < 1920){
+        return redirect('/suitable')
+      }
   if (localStorage.getItem('mental-token') === null || localStorage.getItem('userInfo') === null) {
     message.error('请先登录')
     return redirect('/auth/login')
@@ -94,6 +106,9 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     loader: () => {
+      if(window.innerWidth < 1920){
+        return redirect('/suitable')
+      }
       if (localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 2) {
         return redirect('/back')
       }
@@ -127,7 +142,10 @@ const router = createBrowserRouter([
   },
   ...AuthRoutes,
   ...BackRoutes,
-
+  {
+    path:'/suitable',
+    element:<Suitable/>
+  },
   {
     path: '*',
     element: <NotFound />

@@ -3,6 +3,7 @@ import { Layout, Avatar, Tabs, Button, App as AntdApp } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import robot from '@/assets/images/机器人.png'
 import { logout } from './api/logout';
+import { useEffect } from 'react';
 const { Header, Footer, Content } = Layout;
 function App() {
   const Nav = useNavigate()
@@ -10,6 +11,18 @@ function App() {
   const rootPathName = '/' + location.pathname.split('/')[1]
   const { message } = AntdApp.useApp()
   const HasClientAuth = localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 1
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth < 1900 || window.innerWidth > 2600) {
+        Nav('/suitable', { replace: true })
+      }
+    }
+    window.addEventListener('resize', handleResize)
+    handleResize()
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
   const handleLogout = () => {
     logout().then(_ => {
       localStorage.removeItem('mental-token')
