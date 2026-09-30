@@ -2,7 +2,7 @@ import { Avatar, Card, Divider, Input, message, Spin } from 'antd'
 import robot from '@/assets/images/robot-fill.png'
 import users from '@/assets/images/users.png'
 import "./AiConsultation.css"
-import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, DownCircleFilled, DownCircleOutlined, EllipsisOutlined, LoadingOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
+import { ClockCircleOutlined, DeleteFilled, DeleteOutlined, DownCircleFilled, EllipsisOutlined, LoadingOutlined, MessageOutlined, PlusOutlined, SendOutlined } from '@ant-design/icons'
 import like from '@/assets/images/like.png'
 import { getHistoryList, deleteHistorySession, startNewSession, getHistorySessionMessages, getEmotion } from '@/api/aiconsul'
 import { useEffect, useRef, useState } from 'react'
@@ -48,6 +48,7 @@ export default function AiConsultation() {
   const [, setTotal] = useState(0)
   const [isAiTyping, setIsAiTyping] = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const [loadingHistory, setLoadingHistory] = useState(false)
   const container = useRef<HTMLElement | null>(null)
   const selfScrolled = useRef<boolean>(false)
   const userScrolled = useRef<boolean>(false)
@@ -90,11 +91,6 @@ export default function AiConsultation() {
     }
 
   }, [])
-  useEffect(() => {
-    if (userMsg == '') {
-      container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
-    }
-  }, [userMsg])
   const handleDeleteHistorySession = (id: string | number) => {
     deleteHistorySession(id).then((_) => {
       message.success('删除成功')
@@ -126,6 +122,9 @@ export default function AiConsultation() {
     }
     const userMsgCopy = userMsg
     setUserMsg('')
+    setTimeout(() => {
+      container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
+    }, 200);
     setMessages(messages => ([...messages, {
       id: Date.now(),
       content: userMsgCopy,
@@ -172,6 +171,8 @@ export default function AiConsultation() {
           message.error('服务器返回非流式数据')
         }
         userScrolled.current = false
+        selfScrolled.current = true
+        container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
       },
       onmessage: (res) => {
         if (res.event == 'done') {
@@ -203,9 +204,9 @@ export default function AiConsultation() {
           if (!timer_scroll.current) {
             timer_scroll.current = setTimeout(() => {
               selfScrolled.current = true
-              container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })
+              container.current?.scrollBy({ top: 50, behavior: 'smooth' })
               timer_scroll.current = null
-            }, 600);
+            }, 500);
           }
         }
         if (payload.code.toString() !== '200') {
@@ -301,14 +302,20 @@ export default function AiConsultation() {
                 <div className='w-full flex-1  overflow-auto'>
                   {hasHistoryList && historyList.length === 0 && <div className='text-xl font-bold opacity-60 '>没有历史记录...</div>}
                   {hasHistoryList && historyList.length > 0 && historyList.map(obj => {
-                    return (<div key={obj.id} className='history-list-item mb-3 cursor-pointer p-3' onClick={() => {
-                      getHistorySessionMessages(obj.id).then((res: Array<any> | any) => {
-                        setMessages(res ?? [])
-                        setCurrentSession({ id: 'session_' + obj.id, title: obj.sessionTitle })
-                      })
-                      getEmotion('session_' + obj.id).then(res => {
-                        setCurrentEmotion(res)
-                      })
+                    return (<div key={obj.id} className='history-list-item mb-3 cursor-pointer p-3' onClick={async () => {
+                      // getHistorySessionMessages(obj.id).then((res: Array<any> | any) => {
+                      //   setMessages(res ?? [])
+                      //   setCurrentSession({ id: 'session_' + obj.id, title: obj.sessionTitle })
+                      // })
+                      // getEmotion('session_' + obj.id).then(res => {
+                      //   setCurrentEmotion(res)
+                      // })
+                      setLoadingHistory(true)
+                      const [res1,res2] : any = await Promise.all([getHistorySessionMessages(obj.id),getEmotion('session_' + obj.id)])
+                      setMessages(res1 ?? [])
+                      setCurrentSession({ id: 'session_' + obj.id, title: obj.sessionTitle })
+                      setCurrentEmotion(res2)
+                      setLoadingHistory(false)
                     }}>
                       <div className='flex justify-between items-center'><span className='text-[18px] font-bold'>{obj.sessionTitle}</span><DeleteFilled className='delete-icon' onClick={(e) => { e.stopPropagation(); handleDeleteHistorySession(obj.id) }} /></div>
                       <div className='text-[16px] opacity-70 mb-1'>{obj.startedAt}</div>
@@ -342,14 +349,17 @@ export default function AiConsultation() {
               <div className='h-full w-[5vw] flex justify-center items-center'><div onClick={handleClickPlus} className='w-[1.6vw] h-[1.6vw] flex justify-center items-center cursor-pointer bg-white' style={{ borderRadius: '50%' }}> <PlusOutlined style={{ fontSize: '18px', opacity: "70%" }}></PlusOutlined> </div></div>
             </div>
             <div className=' w-full flex-1 overflow-auto p-6' id="chat-container">
-              {messages.length === 0 && <div className='flex'>
+              {loadingHistory && <div className=' h-full flex justify-center items-center'>
+                <Spin description="加载中..." size="large"></Spin>
+              </div>}
+              {!loadingHistory && messages.length === 0 && <div className='flex'>
                 <div className='breathing-circle-chat-avatar mr-5'><Avatar src={robot} size={25}></Avatar></div>
                 <div className='text-[18px] opacity-90 font-bold break-words p-3 relative' style={{ maxWidth: '33vw', borderRadius: '12px', border: 'solid #eee 1px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                   <p>{helloStr.slice(0, sliceLen)}</p>
                   <span className=' absolute text-[16px] opacity-50' style={{ bottom: '-25px', left: '0' }}>刚刚</span>
                 </div>
               </div>}
-              {messages.length > 0 && messages.map((obj,index) => {
+              {!loadingHistory && messages.length > 0 && messages.map((obj,index) => {
                 if (obj.senderType == 1) {
                   return <div key={obj.id} className='flex justify-end mb-12'>
                     <div className='text-[18px] opacity-90 font-bold break-words p-3 relative' style={{ maxWidth: '33vw', borderRadius: '12px', border: 'solid #eee 1px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
@@ -369,8 +379,9 @@ export default function AiConsultation() {
                 }
               })
               }
-              <div className=' absolute bottom-[20vh] ' style={{left:'50%',transform:"translateX(-50%)"}}><DownCircleFilled style={{transition:'all 0.5s',fontSize:'36px',color:'#666',backgroundColor:'#fff',opacity: showHint ? "1" : "0",cursor:showHint ? "pointer":'default'}} onClick={()=>{if(showHint){container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })}}}/></div>
+              <div className=' absolute bottom-[18.5vh] down-arrow-div' style={{borderRadius:'50%',transition:'all 0.5s',left:'50%',transform:showHint ? "translate(-50%,0)" : "translate(-50%,-50px)"}}><DownCircleFilled style={{transition:'all 0.5s',fontSize:'36px',color:'#888',backgroundColor:'#fff',opacity: showHint ? "1" : "0",cursor:showHint ? "pointer":'default'}} onClick={()=>{if(showHint){container.current?.scrollTo({ top: container.current.scrollHeight, behavior: 'smooth' })}}}/></div>
             </div>
+            
             <div className='w-full h-[18vh] flex p-6' style={{ borderRadius: '0 0 18px 18px', borderTop: 'solid 1px #ddd' }}>
               <div className='flex-1 h-full'>
                 <Input.TextArea value={userMsg} onKeyDown={(e) => handleEnter(e)} onChange={(e) => { setUserMsg(e.currentTarget.value) }} showCount maxLength={500} autoSize={{ minRows: 6, maxRows: 6 }} style={{ fontSize: '16px' }} placeholder='请输入您想要分享的内容...'></Input.TextArea>

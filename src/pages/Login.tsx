@@ -41,10 +41,10 @@ export default function Login() {
         <h3 className='text-4xl font-bold mt-[8vh] mb-[6vh]'>登录您的账户</h3>
         <Form onFinish={onFinish} style={{ width: '100%' }}>
           <Form.Item name='username' rules={[{ required: true, message: '请输入用户名或邮箱' }]}>
-            <Input placeholder='用户名或邮箱' size='large'></Input>
+            <Input placeholder='管理员admin/用户allen' size='large'></Input>
           </Form.Item>
           <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
-            <Input.Password placeholder='密码' size='large' style={{ marginTop: '2vh' }}></Input.Password>
+            <Input.Password placeholder='123456' size='large' style={{ marginTop: '2vh' }}></Input.Password>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType='submit' size='large' style={{ marginTop: '3vh', width: '100%' }}>登录账户</Button>
