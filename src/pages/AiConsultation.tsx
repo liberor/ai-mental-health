@@ -236,6 +236,7 @@ export default function AiConsultation() {
     setMessages([])
     setCurrentSession({ id: '', title: '' })
     setSliceLen(1)
+    setShowHint(false)
     setCurrentEmotion(null)
   }
   return (
