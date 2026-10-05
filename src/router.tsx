@@ -24,7 +24,7 @@ const AuthRoutes = [
     path: '/auth',
     element: <Auth />,
     loader:()=>{
-      if(window.innerWidth < 1920){
+      if(window.innerWidth < 1920 || window.innerHeight < 1000){
         return redirect('/suitable')
       }
     },
@@ -45,7 +45,7 @@ const AuthRoutes = [
   }
 ]
 const ClientRoutesAuthGuard = () => {
-  if(window.innerWidth < 1920){
+  if(window.innerWidth < 1920 || window.innerHeight < 1000){
         return redirect('/suitable')
       }
   if (localStorage.getItem('mental-token') === null || localStorage.getItem('userInfo') === null) {
@@ -58,7 +58,7 @@ const ClientRoutesAuthGuard = () => {
   }
 }
 const BackRoutesAuthGuard = () => {
-  if(window.innerWidth < 1920){
+  if(window.innerWidth < 1920 || window.innerHeight < 1000){
         return redirect('/suitable')
       }
   if (localStorage.getItem('mental-token') === null || localStorage.getItem('userInfo') === null) {
@@ -106,7 +106,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <App />,
     loader: () => {
-      if(window.innerWidth < 1920){
+      if(window.innerWidth < 1920 || window.innerHeight < 1000){
         return redirect('/suitable')
       }
       if (localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 2) {

@@ -28,7 +28,7 @@ export default function BackLayout() {
     } = theme.useToken();
     useEffect(() => {
         function handleResize() {
-            if (window.innerWidth < 1900 || window.innerWidth > 2600) {
+            if (window.innerWidth < 1900 || window.innerWidth > 2600 || window.innerHeight < 1000 || window.innerHeight > 1600) {
                 Nav('/suitable', { replace: true })
             }
         }

@@ -13,7 +13,7 @@ function App() {
   const HasClientAuth = localStorage.getItem('mental-token') && localStorage.getItem('userInfo') && JSON.parse(localStorage.getItem('userInfo')!).userType == 1
   useEffect(() => {
     function handleResize() {
-      if (window.innerWidth < 1900 || window.innerWidth > 2600) {
+      if (window.innerWidth < 1900 || window.innerWidth > 2600 || window.innerHeight < 1000 || window.innerHeight > 1600) {
         Nav('/suitable', { replace: true })
       }
     }

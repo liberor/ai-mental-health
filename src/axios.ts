@@ -44,7 +44,7 @@ service.interceptors.response.use(
             localStorage.removeItem('userInfo')
             setTimeout(() => {
                 window.location.replace('/auth/login')
-            }, 3000);
+            }, 2000);
         }
         return Promise.reject(err)
     }

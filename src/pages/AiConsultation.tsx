@@ -32,7 +32,10 @@ const getEmotionScoreColor = (isNegative: boolean, score: number) => {
 }
 
 export default function AiConsultation() {
-  const h = document.documentElement.clientWidth
+  const [h,setH] = useState(document.documentElement.clientHeight)
+  const isSmallScreen = h <= 1270
+  console.log(h);
+  
   const [historyList, setHistoryList] = useState<Array<any>>([])
   const [hasHistoryList, setHasHistoryList] = useState(false)
   const [userMsg, setUserMsg] = useState('')
@@ -48,6 +51,7 @@ export default function AiConsultation() {
   const [, setTotal] = useState(0)
   const [isAiTyping, setIsAiTyping] = useState(false)
   const [showHint, setShowHint] = useState(false)
+  const userScrollDown = useRef(false)
   const [loadingHistory, setLoadingHistory] = useState(false)
   const container = useRef<HTMLElement | null>(null)
   const selfScrolled = useRef<boolean>(false)
@@ -64,6 +68,9 @@ export default function AiConsultation() {
   }, [sliceLen])
 
   useEffect(() => {
+    window.addEventListener('resize',()=>{
+      setH(document.documentElement.clientHeight)
+    })
     getHistoryList({ pageNum: current, pageSize }).then((res: any) => {
       setHistoryList((res && res.records) ?? [])
       setTotal(res.total)
@@ -74,10 +81,17 @@ export default function AiConsultation() {
       if (selfScrolled.current) return
       userScrolled.current = true
       const el = container.current
-      if(el && el.scrollTop + el.clientHeight + 300 < el.scrollHeight){
+      if(el && el.scrollTop + el.clientHeight + 200 < el.scrollHeight && userScrollDown.current){
         setShowHint(true)
       }else{
         setShowHint(false)
+      }
+    })
+    container.current?.addEventListener('wheel', (e) => {
+      if(e.deltaY < 0){
+        userScrollDown.current = false
+      }else{
+        userScrollDown.current = true
       }
     })
     container.current?.addEventListener('scrollend', () => {
@@ -166,6 +180,7 @@ export default function AiConsultation() {
         sessionId, userMessage
       }),
       signal: ctrl.signal,
+      openWhenHidden:true,
       onopen: async (res) => {
         if (res.headers.get('Content-Type') !== 'text/event-stream') {
           message.error('服务器返回非流式数据')
@@ -216,6 +231,7 @@ export default function AiConsultation() {
       onerror: (err) => {
         setIsAiTyping(false)
         handleError(err ?? 'AI回复失败')
+        throw new Error(err)
       },
       onclose: () => {
         setIsAiTyping(false)
@@ -247,8 +263,8 @@ export default function AiConsultation() {
           {!isShowHistoryOnly && <div className='w-full h-[14vh]  mb-6' >
             <Card hoverable style={{ cursor: 'default', height: '100%' }}>
               <div className=' h-full flex flex-col items-center'>
-                <div className='breathing-circle' style={{ marginBottom: h == 1920 ? '3px' : '12px' }}><Avatar src={robot} size={42}></Avatar></div>
-                <div className='assistant-name' style={{ marginBottom: h == 1920 ? '2px' : '6px' }}>健康AI助手</div>
+                <div className='breathing-circle' style={{ marginBottom: isSmallScreen ? '2px' : '12px' }}><Avatar src={robot} size={42}></Avatar></div>
+                <div className='assistant-name' style={{ marginBottom: isSmallScreen ? '1px' : '6px' }}>健康AI助手</div>
                 <div className='online-status'><span className='status-dot'></span>在线服务中</div>
               </div>
             </Card>
@@ -257,12 +273,12 @@ export default function AiConsultation() {
             <Card hoverable style={{ cursor: 'default', background: ' linear-gradient(135deg, #fef9e7 0%, #fcf4e6 50%, #f6f0e8 100%)' }}>
               <div>
                 <div className='text-xl font-bold' style={{ color: '#8b4513' }}>情绪花园</div>
-                <div className='h-[15vh] flex flex-col items-center' style={{ paddingTop: h == 1920 ? '0px' : '12px' }}>
-                  <div className='emotion-info ' style={{ marginBottom: h == 1920 ? '0px' : '12px' }}>
+                <div className='h-[15vh] flex flex-col items-center' style={{ paddingTop: isSmallScreen ? '0px' : '12px' }}>
+                  <div className='emotion-info ' style={{ marginBottom: isSmallScreen ? '0px' : '12px' }}>
                     <div className='text-[18px] font-bold'>{currentEmotion == null ? "中性" : (currentEmotion.isNegative ? '消极' : '积极')}</div>
                     <div className='text-[18px] font-bold' style={{ color: currentEmotion ? getEmotionScoreColor(currentEmotion.isNegative, currentEmotion.emotionScore) : 'white' }}>{currentEmotion == null ? "50" : currentEmotion.emotionScore}</div>
                   </div>
-                  <div className='flex justify-center items-center' style={{ marginBottom: h == 1920 ? '5px' : '12px', marginTop: h == 1920 ? '5px' : '0px' }}>
+                  <div className='flex justify-center items-center' style={{ marginBottom: isSmallScreen ? '5px' : '12px', marginTop: isSmallScreen ? '5px' : '0px' }}>
                     <span className='text-[16px] mr-3 opacity-80'>今天感觉</span>
                     <span className='text-xl font-bold'>{currentEmotion == null ? "很不错" : currentEmotion.primaryEmotion}</span>
                   </div>
@@ -279,7 +295,7 @@ export default function AiConsultation() {
                   </div>
                 </div>
                 {currentEmotion && currentEmotion.improvementSuggestions && currentEmotion.improvementSuggestions.length > 0 && <div>
-                  <div className='text-[18px] font-bold ' style={{ marginBottom: h == 1920 ? '8px' : '16px', marginTop: h == 1920 ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
+                  <div className='text-[18px] font-bold ' style={{ marginBottom: isSmallScreen ? '8px' : '16px', marginTop: isSmallScreen ? '10px' : '20px', color: '#a38d6e', textAlign: "center" }}>治愈小行动</div>
                   {currentEmotion.improvementSuggestions.map((item: string) => {
                     return <div key={item} className='py-1 pl-5 mb-3' style={{ borderRadius: '12px', backgroundColor: '#FDFDF8', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}><span className='text-xl mr-2'>✨</span><span className='text-[15px] ' style={{ color: '#9D9487', fontWeight: '500' }}>{item}</span></div>
                   })}
@@ -385,7 +401,7 @@ export default function AiConsultation() {
             
             <div className='w-full h-[18vh] flex p-6' style={{ borderRadius: '0 0 18px 18px', borderTop: 'solid 1px #ddd' }}>
               <div className='flex-1 h-full'>
-                <Input.TextArea value={userMsg} onKeyDown={(e) => handleEnter(e)} onChange={(e) => { setUserMsg(e.currentTarget.value) }} showCount maxLength={500} autoSize={{ minRows: 6, maxRows: 6 }} style={{ fontSize: '16px' }} placeholder='请输入您想要分享的内容...'></Input.TextArea>
+                <Input.TextArea value={userMsg} onKeyDown={(e) => handleEnter(e)} onChange={(e) => { setUserMsg(e.currentTarget.value) }} showCount maxLength={500} autoSize={{ minRows: isSmallScreen ? 5:6, maxRows: isSmallScreen ? 5:6 }} style={{ fontSize: '16px' }} placeholder='请输入您想要分享的内容...'></Input.TextArea>
               </div>
               <div className='w-[3vw] ml-3 h-full flex flex-col justify-between'>
                 <div onClick={handleSend} className='w-[2.5vw] h-[2.5vw] mb-[10px] justify-center flex items-center cursor-pointer' style={{ borderRadius: '20px', backgroundColor: '#f59e0b' }}><SendOutlined style={{ fontSize: '24px', color: 'white' }} /></div>
